@@ -106,7 +106,7 @@
     display:flex; flex-wrap:wrap; gap:20px 32px; align-items:flex-end; justify-content:space-between;
     padding-bottom:18px; margin-bottom:20px; border-bottom:2px solid var(--border-strong);
   }
-  .heading-block{max-width:640px;}
+  .heading-block{max-width:900px; flex:1 1 420px;}
   .eyebrow{
     font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);
     font-weight:600; margin-bottom:6px;
@@ -115,7 +115,7 @@
     font-family:"Noto Serif KR", serif; font-weight:700; font-size:28px; margin:0 0 8px;
     text-wrap:balance; color:var(--ink);
   }
-  .sub{color:var(--ink-dim); font-size:14px; line-height:1.6; max-width:58ch;}
+  .sub{color:var(--ink-dim); font-size:14px; line-height:1.6;}
   .job-badge{
     display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
     color:var(--accent-ei); background:var(--accent-ei-bg); border:1px solid var(--accent-ei-bg-strong);
@@ -123,7 +123,7 @@
   }
 
   .period-box{
-    display:flex; flex-direction:column; gap:6px; min-width:190px;
+    display:flex; flex-direction:column; gap:6px; min-width:190px; flex:0 0 auto;
   }
   .period-box label{font-size:12px; color:var(--ink-dim); font-weight:600;}
   select, input[type=text]{
@@ -172,6 +172,7 @@
   thead tr.col-row th.left{text-align:left;}
   thead tr.col-row th.hl-ei{background:var(--accent-ei-bg);}
   thead tr.col-row th.hl-ai{background:var(--accent-ai-bg);}
+  thead tr.col-row .col-note{font-weight:400; color:var(--ink-faint); font-size:10.5px;}
   tbody td{
     padding:7px 10px; border-bottom:1px solid var(--border); text-align:right; font-size:13.5px;
     white-space:nowrap;
@@ -282,7 +283,7 @@
         <thead>
           <tr class="group-row">
             <th colspan="3"></th>
-            <th class="g-ei" colspan="2">고용보험</th>
+            <th class="g-ei" colspan="3">고용보험</th>
             <th class="g-ai" colspan="3">산재보험</th>
             <th colspan="4"></th>
           </tr>
@@ -290,6 +291,7 @@
             <th class="left" style="width:34px">#</th>
             <th class="left" style="min-width:120px">이름</th>
             <th style="min-width:130px">월 지급액(사업소득)</th>
+            <th class="hl-ei" style="min-width:110px">월보수액<br><span class="col-note">(신고용)</span></th>
             <th class="hl-ei">근로자 부담</th>
             <th class="hl-ei">사업주 부담</th>
             <th class="hl-ai">강사 부담</th>
@@ -305,6 +307,7 @@
         <tfoot>
           <tr>
             <td class="left" colspan="3">합계</td>
+            <td id="sumMonthlySalary">0</td>
             <td id="sumEmployee">0</td>
             <td id="sumEmployerEi">0</td>
             <td id="sumAiEmployee">0</td>
@@ -547,6 +550,7 @@
       '<td class="left">' + rowSeq + '</td>' +
       '<td class="left"><input class="name-input f-name" type="text" placeholder="이름"></td>' +
       '<td><input class="f-income" type="text" inputmode="numeric" placeholder="0"></td>' +
+      '<td class="hl-ei out-monthly-salary">0</td>' +
       '<td class="hl-ei out-employee">0</td>' +
       '<td class="hl-ei out-employer-ei">0</td>' +
       '<td class="hl-ai out-ai-employee">0</td>' +
@@ -586,13 +590,14 @@
   function recalcAll(){
     renumber();
     var periodKey = periodSelect.value;
-    var sums = {employee:0, employerEi:0, aiEmployee:0, aiEmployer:0, employeeTotal:0, employerTotal:0, grand:0};
+    var sums = {monthlySalary:0, employee:0, employerEi:0, aiEmployee:0, aiEmployer:0, employeeTotal:0, employerTotal:0, grand:0};
     var first = null;
 
     Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
       var income = parseNum(tr.querySelector(".f-income").value);
       if (!income){
         tr.classList.remove("excluded");
+        tr.querySelector(".out-monthly-salary").textContent = "0";
         tr.querySelector(".out-employee").textContent = "0";
         tr.querySelector(".out-employer-ei").textContent = "0";
         tr.querySelector(".out-ai-employee").textContent = "0";
@@ -605,6 +610,7 @@
       }
       var r = calcPerson(income, periodKey);
       tr.classList.toggle("excluded", r.ei.excluded);
+      tr.querySelector(".out-monthly-salary").textContent = won(r.ei.monthlySalary);
       tr.querySelector(".out-employee").textContent = won(r.ei.employeeCost);
       tr.querySelector(".out-employer-ei").textContent = won(r.ei.employerCost);
       tr.querySelector(".out-ai-employee").textContent = won(r.ai.employeeShare);
@@ -614,6 +620,7 @@
       tr.querySelector(".out-employer-total").textContent = won(r.employerTotal);
       tr.querySelector(".out-grand").textContent = won(r.grandTotal);
 
+      sums.monthlySalary += r.ei.monthlySalary;
       sums.employee += r.ei.employeeCost;
       sums.employerEi += r.ei.employerCost;
       sums.aiEmployee += r.ai.employeeShare;
@@ -625,6 +632,7 @@
       if (!first) first = {name: tr.querySelector(".f-name").value || "(이름 미입력)", income:income, r:r};
     });
 
+    document.getElementById("sumMonthlySalary").textContent = won(sums.monthlySalary);
     document.getElementById("sumEmployee").textContent = won(sums.employee);
     document.getElementById("sumEmployerEi").textContent = won(sums.employerEi);
     document.getElementById("sumAiEmployee").textContent = won(sums.aiEmployee);
@@ -703,7 +711,7 @@
   });
 
   document.getElementById("copyBtn").addEventListener("click", function(){
-    var header = ["이름","월지급액","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
+    var header = ["이름","월지급액","월보수액(고용신고용)","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
     var lines = [header.join("\t")];
     Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
       var income = parseNum(tr.querySelector(".f-income").value);
@@ -711,6 +719,7 @@
       lines.push([
         tr.querySelector(".f-name").value,
         tr.querySelector(".f-income").value,
+        tr.querySelector(".out-monthly-salary").textContent,
         tr.querySelector(".out-employee").textContent,
         tr.querySelector(".out-employer-ei").textContent,
         tr.querySelector(".out-ai-employee").textContent,
@@ -721,6 +730,7 @@
       ].join("\t"));
     });
     lines.push(["합계","",
+      document.getElementById("sumMonthlySalary").textContent,
       document.getElementById("sumEmployee").textContent,
       document.getElementById("sumEmployerEi").textContent,
       document.getElementById("sumAiEmployee").textContent,
