@@ -1,0 +1,8 @@
+{
+  "eiLatestPeriod": "2026-2",
+  "eiHash": "a6cb9b18f195f267a894610cc8bcb41d5633e3b8fe0302c4ecba465ff18647d9",
+  "aiLatestPeriod": "2026-2",
+  "aiHash": "e88e9169117d81f3bdb0ca05458f8b60424f91241927597d603505c7b90526fa",
+  "verifiedAt": "2026-09-10",
+  "note": "이 값이 comwel.or.kr 계산기와 달라지면 scripts/check-rates.mjs가 rate-status.json에 변경을 기록합니다. 변경이 확인되어 index.html의 요율표(EI/AI 객체)를 새 값으로 고쳤다면, 'node scripts/check-rates.mjs'를 로컬에서 한 번 더 실행해 콘솔 맨 아래에 출력되는 eiLatestPeriod/eiHash/aiLatestPeriod/aiHash 값을 이 파일에 그대로 옮겨 적고 verifiedAt을 오늘 날짜로 바꿔주세요. 그래야 다음 자동 점검이 새 기준으로 비교합니다."
+}

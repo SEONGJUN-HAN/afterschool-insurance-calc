@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>방과후강사 보험료 일괄계산기</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    color-scheme: light dark;
+    --bg:#f5f2ea;
+    --surface:#ffffff;
+    --surface-alt:#efeade;
+    --border:#d9d2bf;
+    --border-strong:#b9b09a;
+    --ink:#242119;
+    --ink-dim:#726c5c;
+    --ink-faint:#9c937c;
+    --accent-ei:#2f5578;
+    --accent-ei-bg:#e6edf3;
+    --accent-ei-bg-strong:#d3e0ea;
+    --accent-ai:#96502e;
+    --accent-ai-bg:#f3e8de;
+    --accent-ai-bg-strong:#e9d5c2;
+    --warn:#a13a2f;
+    --warn-bg:#fbe9e5;
+    --warn-border:#e5b6ac;
+    --ok:#2f6f4f;
+    --ok-bg:#e8f2ec;
+    --focus:#2f5578;
+    --shadow: 0 1px 2px rgba(36,33,25,.06), 0 4px 14px rgba(36,33,25,.05);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#1c1a15;
+      --surface:#262319;
+      --surface-alt:#302c20;
+      --border:#463f2f;
+      --border-strong:#5c5340;
+      --ink:#efe9da;
+      --ink-dim:#b6ac96;
+      --ink-faint:#8a8069;
+      --accent-ei:#7fa8ce;
+      --accent-ei-bg:#26333f;
+      --accent-ei-bg-strong:#304254;
+      --accent-ai:#d59567;
+      --accent-ai-bg:#3a2c20;
+      --accent-ai-bg-strong:#4a3626;
+      --warn:#e28577;
+      --warn-bg:#3c231f;
+      --warn-border:#6b3a30;
+      --ok:#7fc79e;
+      --ok-bg:#1f2e26;
+      --focus:#7fa8ce;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#1c1a15;
+    --surface:#262319;
+    --surface-alt:#302c20;
+    --border:#463f2f;
+    --border-strong:#5c5340;
+    --ink:#efe9da;
+    --ink-dim:#b6ac96;
+    --ink-faint:#8a8069;
+    --accent-ei:#7fa8ce;
+    --accent-ei-bg:#26333f;
+    --accent-ei-bg-strong:#304254;
+    --accent-ai:#d59567;
+    --accent-ai-bg:#3a2c20;
+    --accent-ai-bg-strong:#4a3626;
+    --warn:#e28577;
+    --warn-bg:#3c231f;
+    --warn-border:#6b3a30;
+    --ok:#7fc79e;
+    --ok-bg:#1f2e26;
+    --focus:#7fa8ce;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 4px 16px rgba(0,0,0,.35);
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:"Noto Sans KR", "Malgun Gothic", sans-serif;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1180px;margin:0 auto;}
+
+  .status-banner{
+    display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border-radius:10px;
+    margin-bottom:18px; font-size:13px; line-height:1.6;
+  }
+  .status-banner.ok{background:var(--ok-bg); border:1px solid var(--ok); color:var(--ink);}
+  .status-banner.warn{background:var(--warn-bg); border:1px solid var(--warn); color:var(--ink);}
+  .status-banner.unknown{background:var(--surface); border:1px solid var(--border-strong); color:var(--ink-dim);}
+  .status-banner .icon{font-size:16px; line-height:1.4;}
+  .status-banner ul{margin:6px 0 0; padding-left:18px;}
+  .status-banner strong{font-weight:700;}
+
+  header{
+    display:flex; flex-wrap:wrap; gap:20px 32px; align-items:flex-end; justify-content:space-between;
+    padding-bottom:18px; margin-bottom:20px; border-bottom:2px solid var(--border-strong);
+  }
+  .heading-block{max-width:640px;}
+  .eyebrow{
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-faint);
+    font-weight:600; margin-bottom:6px;
+  }
+  h1{
+    font-family:"Noto Serif KR", serif; font-weight:700; font-size:28px; margin:0 0 8px;
+    text-wrap:balance; color:var(--ink);
+  }
+  .sub{color:var(--ink-dim); font-size:14px; line-height:1.6; max-width:58ch;}
+  .job-badge{
+    display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600;
+    color:var(--accent-ei); background:var(--accent-ei-bg); border:1px solid var(--accent-ei-bg-strong);
+    padding:4px 10px; border-radius:999px; margin-top:10px;
+  }
+
+  .period-box{
+    display:flex; flex-direction:column; gap:6px; min-width:190px;
+  }
+  .period-box label{font-size:12px; color:var(--ink-dim); font-weight:600;}
+  select, input[type=text]{
+    font-family:inherit; font-size:14px; color:var(--ink); background:var(--surface);
+    border:1px solid var(--border-strong); border-radius:7px; padding:8px 10px;
+  }
+  select:focus, input:focus, button:focus-visible{
+    outline:2px solid var(--focus); outline-offset:1px;
+  }
+  #period{font-weight:600; font-size:15px; padding:9px 12px;}
+
+  .toolbar{
+    display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-bottom:14px;
+  }
+  button{
+    font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
+    border-radius:7px; padding:9px 14px; border:1px solid var(--border-strong);
+    background:var(--surface); color:var(--ink);
+    transition:background .12s ease, border-color .12s ease, transform .05s ease;
+  }
+  button:hover{border-color:var(--accent-ei); color:var(--accent-ei);}
+  button:active{transform:translateY(1px);}
+  button.primary{background:var(--accent-ei); border-color:var(--accent-ei); color:#fff;}
+  button.primary:hover{opacity:.92; color:#fff;}
+  button.ghost{background:transparent; border-color:var(--border);}
+  .toolbar .spacer{flex:1;}
+  .copy-msg{font-size:12.5px; color:var(--accent-ei); font-weight:600; opacity:0; transition:opacity .2s;}
+  .copy-msg.show{opacity:1;}
+
+  .table-shell{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    box-shadow:var(--shadow); overflow:hidden; margin-bottom:22px;
+  }
+  .table-scroll{overflow-x:auto;}
+  table{border-collapse:collapse; width:100%; min-width:980px; font-variant-numeric:tabular-nums;}
+  thead tr.group-row th{
+    font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-weight:700;
+    padding:8px 10px; border-bottom:1px solid var(--border); text-align:center;
+  }
+  thead tr.group-row th.g-ei{background:var(--accent-ei-bg); color:var(--accent-ei);}
+  thead tr.group-row th.g-ai{background:var(--accent-ai-bg); color:var(--accent-ai);}
+  thead tr.col-row th{
+    font-size:12.5px; font-weight:600; color:var(--ink-dim); text-align:right;
+    padding:9px 10px; border-bottom:2px solid var(--border-strong); white-space:nowrap;
+  }
+  thead tr.col-row th.left{text-align:left;}
+  thead tr.col-row th.hl-ei{background:var(--accent-ei-bg);}
+  thead tr.col-row th.hl-ai{background:var(--accent-ai-bg);}
+  tbody td{
+    padding:7px 10px; border-bottom:1px solid var(--border); text-align:right; font-size:13.5px;
+    white-space:nowrap;
+  }
+  tbody td.left{text-align:left;}
+  tbody tr:nth-child(even){background:var(--surface-alt);}
+  tbody tr.excluded td{color:var(--ink-faint);}
+  tbody td.hl-ei{background:color-mix(in srgb, var(--accent-ei-bg) 55%, transparent);}
+  tbody td.hl-ai{background:color-mix(in srgb, var(--accent-ai-bg) 55%, transparent);}
+  tbody td.total-cell{font-weight:700; color:var(--ink);}
+  tbody input{
+    width:100%; border:1px solid transparent; background:transparent; text-align:right;
+    padding:5px 6px; border-radius:5px; font-size:13.5px; color:var(--ink); font-family:inherit;
+    font-variant-numeric:tabular-nums;
+  }
+  tbody input.name-input{text-align:left;}
+  tbody input:hover{border-color:var(--border);}
+  tbody input:focus{border-color:var(--accent-ei); background:var(--surface);}
+  .flag{font-size:11px; font-weight:700; color:var(--warn); background:var(--warn-bg); padding:1px 6px; border-radius:5px; margin-left:6px;}
+  .row-del{
+    border:none; background:none; color:var(--ink-faint); font-size:16px; padding:2px 8px; border-radius:5px;
+  }
+  .row-del:hover{color:var(--warn); border-color:transparent; background:var(--warn-bg);}
+  tfoot td{
+    padding:10px; border-top:2px solid var(--border-strong); font-weight:700; text-align:right;
+    background:var(--surface-alt); font-size:13.5px;
+  }
+  tfoot td.left{text-align:left; color:var(--ink-dim); font-weight:600;}
+
+  .panels{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:22px;}
+  @media (max-width:800px){.panels{grid-template-columns:1fr;}}
+  .panel{
+    background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px;
+    box-shadow:var(--shadow);
+  }
+  .panel h2{font-size:13px; margin:0 0 10px; color:var(--ink-dim); font-weight:700; letter-spacing:.02em;}
+  .panel textarea{
+    width:100%; min-height:96px; resize:vertical; border:1px solid var(--border-strong); border-radius:7px;
+    padding:9px 10px; font-family:inherit; font-size:13px; color:var(--ink); background:var(--bg);
+  }
+  .panel .row-actions{display:flex; gap:8px; margin-top:10px;}
+  .hint{font-size:12px; color:var(--ink-faint); margin-top:8px; line-height:1.6;}
+
+  .check-panel{
+    background:var(--surface); border:1px solid var(--accent-ai-bg-strong); border-radius:12px;
+    padding:18px 20px; margin-bottom:22px; box-shadow:var(--shadow);
+  }
+  .check-panel h2{
+    font-size:14px; margin:0 0 8px; color:var(--accent-ai); font-weight:700;
+  }
+  .check-panel > p.hint{margin-top:0; margin-bottom:14px; font-size:12.5px;}
+  .check-panel > p.hint:last-child{margin-top:14px; margin-bottom:0;}
+  .check-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:800px){.check-grid{grid-template-columns:1fr;}}
+  .check-card{
+    background:var(--accent-ai-bg); border:1px solid var(--accent-ai-bg-strong); border-radius:9px; padding:13px 15px;
+  }
+  .check-card-title{font-weight:700; font-size:13px; color:var(--accent-ai); margin-bottom:6px;}
+  .check-card p{font-size:12.5px; color:var(--ink-dim); margin:0 0 8px; line-height:1.5;}
+  .check-values{
+    font-size:12.5px; font-weight:600; color:var(--ink); background:var(--surface); border-radius:6px;
+    padding:7px 9px; margin-bottom:9px; font-variant-numeric:tabular-nums; line-height:1.5;
+  }
+  .check-values-sub{font-weight:400; color:var(--ink-faint); font-size:11.5px;}
+  .check-link{display:inline-block; font-size:12.5px; font-weight:600; color:var(--accent-ai);}
+
+  footer{
+    border-top:1px solid var(--border); padding-top:16px; font-size:12.5px; color:var(--ink-dim); line-height:1.8;
+  }
+  footer a{color:var(--accent-ei);}
+  footer .legend{display:flex; gap:18px; flex-wrap:wrap; margin-bottom:10px;}
+  footer .legend span{display:inline-flex; align-items:center; gap:6px;}
+  footer .dot{width:9px; height:9px; border-radius:3px; display:inline-block;}
+  .dot.ei{background:var(--accent-ei);}
+  .dot.ai{background:var(--accent-ai);}
+  footer .asof{font-weight:700; color:var(--ink);}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div id="statusBanner" class="status-banner unknown" hidden></div>
+
+  <header>
+    <div class="heading-block">
+      <div class="eyebrow">근로복지공단 노무제공자 보험료 모의계산 · 일괄판</div>
+      <h1>방과후강사 보험료 일괄계산기</h1>
+      <p class="sub">여러 강사의 월 지급액을 한 번에 넣으면 고용보험과 산재보험을 각각 계산합니다. 근로복지공단 모의계산기의 방과후 학교강사 기준을 그대로 적용했으며, 산재보험은 2024년 1월 귀속분부터 강사·사업주가 1/2씩 분담하는 방식을 반영했습니다.</p>
+      <span class="job-badge">직종 고정 · 방과후 학교강사</span>
+    </div>
+    <div class="period-box">
+      <label for="period">적용 기간</label>
+      <select id="period"></select>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="primary" id="addRowBtn">+ 강사 추가</button>
+    <button class="ghost" id="clearBtn">전체 지우기</button>
+    <span class="spacer"></span>
+    <span class="copy-msg" id="copyMsg">표가 복사되었습니다 — 엑셀에 붙여넣으세요</span>
+    <button id="copyBtn">결과표 복사</button>
+  </div>
+
+  <div class="table-shell">
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr class="group-row">
+            <th colspan="3"></th>
+            <th class="g-ei" colspan="2">고용보험</th>
+            <th class="g-ai" colspan="3">산재보험</th>
+            <th colspan="4"></th>
+          </tr>
+          <tr class="col-row">
+            <th class="left" style="width:34px">#</th>
+            <th class="left" style="min-width:120px">이름</th>
+            <th style="min-width:130px">월 지급액(사업소득)</th>
+            <th class="hl-ei">근로자 부담</th>
+            <th class="hl-ei">사업주 부담</th>
+            <th class="hl-ai">강사 부담</th>
+            <th class="hl-ai">사업주 부담</th>
+            <th class="hl-ai" style="width:30px"></th>
+            <th>강사 본인 총부담</th>
+            <th>사업주 총부담</th>
+            <th class="total-cell-head">월 보험료 총액</th>
+            <th style="width:30px"></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+        <tfoot>
+          <tr>
+            <td class="left" colspan="3">합계</td>
+            <td id="sumEmployee">0</td>
+            <td id="sumEmployerEi">0</td>
+            <td id="sumAiEmployee">0</td>
+            <td id="sumAiEmployer">0</td>
+            <td></td>
+            <td id="sumEmployeeTotal">0</td>
+            <td id="sumEmployerTotal">0</td>
+            <td class="total-cell" id="sumGrand">0</td>
+            <td></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="panel">
+      <h2>엑셀에서 여러 명 붙여넣기</h2>
+      <textarea id="bulkInput" placeholder="이름[Tab]월지급액 형태로, 줄마다 한 명씩 붙여넣으세요.&#10;예)&#10;김민지	1200000&#10;박서준	980000"></textarea>
+      <div class="row-actions">
+        <button class="primary" id="bulkAddBtn">표에 추가</button>
+        <button class="ghost" id="bulkReplaceBtn">표를 이 내용으로 교체</button>
+      </div>
+      <p class="hint">엑셀에서 이름·금액 열을 드래그해 복사한 뒤 그대로 붙여넣어도 인식됩니다(탭 또는 쉼표 구분).</p>
+    </div>
+    <div class="panel">
+      <h2>산정 방식 확인</h2>
+      <p class="hint" id="checkExplain">강사를 한 명 이상 입력하면, 그중 첫 번째 강사의 계산 과정을 근로복지공단 계산기 항목 순서 그대로 여기에 풀어서 보여줍니다. 공식 사이트 결과와 대조해 검증할 때 사용하세요.</p>
+    </div>
+  </div>
+
+  <div class="check-panel">
+    <h2>이 계산기, 지금도 최신 요율일까?</h2>
+    <p class="hint">이 저장소는 매달 1일 GitHub Actions로 근로복지공단 공식 계산기를 자동 점검합니다. 변경이 감지되면 이 페이지 맨 위에 배너로 표시됩니다. 그래도 직접 확인하고 싶다면 아래 공식 표에서 <strong>"방과후학교강사"</strong> 한 줄만 보면 됩니다.</p>
+    <div class="check-grid">
+      <div class="check-card">
+        <div class="check-card-title">① 고용보험 공제율·요율표</div>
+        <p>근로복지공단이 공시하는 표에서 "방과후학교강사" 줄의 공제율이 아래 값과 같은지 확인하세요.</p>
+        <div class="check-values">이 계산기 값 — 16.5% · 16.5% · 14.9% · 19.3%<br><span class="check-values-sub">(2023.7~2024.6 / 2024.7~2025.6 / 2025.7~2026.6 / 2026.7~2027.6)</span></div>
+        <a class="check-link" href="https://www.comwel.or.kr/comwel/paym/spec/spec7.jsp" target="_blank" rel="noopener">공식 표 열기 → 근로복지공단 &gt; 노무제공자 고용보험 &gt; 보험료 산정 및 부과 ↗</a>
+      </div>
+      <div class="check-card">
+        <div class="check-card-title">② 산재보험 공제율·요율표</div>
+        <p>같은 방식으로 "방과후학교강사"의 공제율·직종별요율(6‰)·출퇴근재해요율이 같은지 확인하세요.</p>
+        <div class="check-values">이 계산기 값 — 공제율 16.5%·16.5%·14.9%·19.3%, 직종요율 6‰, 출퇴근재해요율 0.6‰(2023년 1‰), 2024년 1월 귀속분부터 강사·사업주 1/2씩 분담</div>
+        <a class="check-link" href="https://www.comwel.or.kr/comwel/paym/spec/spec3.jsp" target="_blank" rel="noopener">공식 표 열기 → 근로복지공단 &gt; 노무제공자 산재보험 &gt; 보험료 산정 및 부과 ↗</a>
+      </div>
+    </div>
+    <p class="hint">표의 값이 위와 다르면 요율이 개정된 것입니다. 아래 공식 모의계산기로 1인 금액을 대조해 당분간 이용해 주세요.
+      <a href="https://www.comwel.or.kr/comwel/bohumcal2.jsp" target="_blank" rel="noopener">고용보험 모의계산기 ↗</a> ·
+      <a href="https://www.comwel.or.kr/comwel/bohumcal4.jsp" target="_blank" rel="noopener">산재보험 모의계산기 ↗</a>
+    </p>
+  </div>
+
+  <footer>
+    <div class="legend">
+      <span><span class="dot ei"></span>고용보험 — 근로자·사업주 각 0.8% 분담, 필요경비 제외 후 월보수액 기준</span>
+      <span><span class="dot ai"></span>산재보험 — 2023년은 사업주 전액 부담, 2024년 1월 귀속분부터는 강사·사업주가 1/2씩 분담</span>
+    </div>
+    <div><strong>비과세소득 입력란이 없는 이유</strong> — 공식 계산기의 "월 비과세소득" 항목은 소득세법 제12조제2호(사업소득)·제5호(기타소득)가 정한 비과세소득을 뺀다는 뜻인데, 그 목록(농어가부업소득·조림소득·훈장 부상금·보훈급여금 등)에 방과후강사료가 해당하는 경우는 없습니다. 그래서 이 계산기는 비과세소득을 0원으로 고정했습니다. 드물게 해당 사항이 있다고 판단되면 근로복지공단(1588-0075)에 확인 후 공식 모의계산기를 직접 이용해 주세요.</div>
+    <div>근거: 근로복지공단 「노무제공자 고용보험·산재보험 — 보험료 산정 및 부과」 공식 고시 표 및 노무제공자 보험료 모의계산기의 방과후 학교강사 공제율·요율·상한액을 그대로 반영했습니다.</div>
+    <div>실제 신고·부과 금액은 월 보수 신고 방식 등에 따라 공식 계산기 결과와 다를 수 있습니다.</div>
+  </footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---- 근로복지공단 "방과후 학교강사" 요율 테이블 ----
+  var PERIODS = [
+    {key:"2023",   label:"2023년"},
+    {key:"2024-1", label:"2024년 상반기(1~6월)"},
+    {key:"2024-2", label:"2024년 하반기(7~12월)"},
+    {key:"2025-1", label:"2025년 상반기(1~6월)"},
+    {key:"2025-2", label:"2025년 하반기(7~12월)"},
+    {key:"2026-1", label:"2026년 상반기(1~6월)"},
+    {key:"2026-2", label:"2026년 하반기(7월~)"}
+  ];
+
+  // 고용보험: 필요경비율(afterschool), 부담 상한액(근로자/사업주 각각)
+  var EI = {
+    "2023":   {expenseRate:0.165, cap:275440},
+    "2024-1": {expenseRate:0.165, cap:365520},
+    "2024-2": {expenseRate:0.165, cap:365520},
+    "2025-1": {expenseRate:0.165, cap:306360},
+    "2025-2": {expenseRate:0.149, cap:306360},
+    "2026-1": {expenseRate:0.149, cap:324580},
+    "2026-2": {expenseRate:0.193, cap:324580}
+  };
+  var EI_PREMIUM_RATE = 0.008;      // 2022.7.1.부터 1.6%를 근로자/사업주가 절반씩(0.8%) 부담
+  var EI_FLOOR = 800000;            // 미만이면 고용보험 적용제외
+  var EI_MIN_BASIS = 1330000;       // 80만~133만원 구간은 133만원을 기준으로 산정
+
+  // 산재보험: 필요경비율(%값*10 그대로 사용), 직종요율(‰), 출퇴근요율(‰)
+  // split:false → 2023년, 사업주 전액 부담 / split:true → 2024년 1월 귀속분부터, 강사·사업주 각 1/2씩 부담
+  var AI = {
+    "2023":   {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:1,   split:false},
+    "2024-1": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
+    "2024-2": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
+    "2025-1": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
+    "2025-2": {deductionRateX10:149, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
+    "2026-1": {deductionRateX10:149, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
+    "2026-2": {deductionRateX10:193, jobRatePerMille:6, commuteRatePerMille:0.6, split:true}
+  };
+
+  function roundDownToTen(n){ return n - (n % 10); }
+
+  // 방과후강사료(사업소득/기타소득)는 소득세법 제12조제2호·제5호가 정한 비과세소득 목록에 해당하지 않아 항상 0원으로 취급한다.
+  var EXEMPTION = 0;
+
+  function calcEmploymentInsurance(income, periodKey){
+    var cfg = EI[periodKey];
+    var expense = Math.floor((income - EXEMPTION) * cfg.expenseRate);
+    var monthlySalary = income - EXEMPTION - expense;
+    if (monthlySalary < EI_FLOOR){
+      return {expense:expense, monthlySalary:monthlySalary, employeeCost:0, employerCost:0, excluded:true};
+    }
+    var basis = (monthlySalary < EI_MIN_BASIS) ? EI_MIN_BASIS : monthlySalary;
+    var employeeCost = roundDownToTen(Math.trunc(basis * EI_PREMIUM_RATE));
+    var employerCost = roundDownToTen(Math.trunc(basis * EI_PREMIUM_RATE));
+    if (employeeCost > cfg.cap) employeeCost = cfg.cap;
+    if (employerCost > cfg.cap) employerCost = cfg.cap;
+    return {expense:expense, monthlySalary:monthlySalary, employeeCost:employeeCost, employerCost:employerCost, excluded:false};
+  }
+
+  function calcAccidentInsurance(income, periodKey){
+    var cfg = AI[periodKey];
+    var necessaryExpenses = Math.trunc(income * cfg.deductionRateX10 / 1000);
+    var base = income - necessaryExpenses;
+    var jobRate = cfg.jobRatePerMille * 0.001;
+    var commuteRate = cfg.commuteRatePerMille * 0.001;
+    if (cfg.split){
+      // 각자 몫 = 월보수액 * [(직종별요율+출퇴근요율)/2], 강사·사업주가 동일 금액을 각각 부담
+      var share = Math.floor(base * (jobRate + commuteRate) / 2 / 10) * 10;
+      return {necessaryExpenses:necessaryExpenses, base:base, employeeShare:share, employerShare:share, total:share * 2};
+    }
+    var full = Math.floor(base * (jobRate + commuteRate) / 10) * 10;
+    return {necessaryExpenses:necessaryExpenses, base:base, employeeShare:0, employerShare:full, total:full};
+  }
+
+  function calcPerson(income, periodKey){
+    var ei = calcEmploymentInsurance(income, periodKey);
+    var ai = calcAccidentInsurance(income, periodKey);
+    var employeeTotal = ei.employeeCost + ai.employeeShare;
+    var employerTotal = ei.employerCost + ai.employerShare;
+    var grandTotal = employeeTotal + employerTotal;
+    return {ei:ei, ai:ai, employeeTotal:employeeTotal, employerTotal:employerTotal, grandTotal:grandTotal};
+  }
+
+  // ---------------- 자동 점검 상태 배너 ----------------
+  function renderStatus(status){
+    var el = document.getElementById("statusBanner");
+    if (!status){
+      el.className = "status-banner unknown";
+      el.innerHTML = '<span class="icon">ℹ️</span><span>자동 점검 결과를 아직 불러오지 못했습니다(첫 배포 직후이거나 오프라인 상태일 수 있음). 아래 "셀프체크" 표로 직접 확인해 주세요.</span>';
+      el.hidden = false;
+      return;
+    }
+    if (status.upToDate){
+      el.className = "status-banner ok";
+      el.innerHTML = '<span class="icon">✅</span><span><strong>최신 요율로 확인됨</strong> · 마지막 자동 점검: ' + status.checkedAt + '</span>';
+    } else {
+      el.className = "status-banner warn";
+      var items = (status.issues || []).map(function(i){ return "<li>" + i + "</li>"; }).join("");
+      el.innerHTML = '<span class="icon">⚠️</span><div><strong>근로복지공단 요율에 변경이 감지되었습니다</strong>(자동 점검: ' + status.checkedAt + '). 계산 결과가 최신이 아닐 수 있으니 아래 공식 계산기와 대조해 주세요.<ul>' + items + '</ul></div>';
+    }
+    el.hidden = false;
+  }
+
+  fetch("./rate-status.json", {cache:"no-store"})
+    .then(function(r){ if(!r.ok) throw new Error("no status file"); return r.json(); })
+    .then(renderStatus)
+    .catch(function(){ renderStatus(null); });
+
+  // ---------------- UI ----------------
+  var periodSelect = document.getElementById("period");
+  PERIODS.forEach(function(p){
+    var opt = document.createElement("option");
+    opt.value = p.key; opt.textContent = p.label;
+    periodSelect.appendChild(opt);
+  });
+  periodSelect.value = "2026-2";
+
+  var STORAGE_KEY = "afterschool-insurance-calc-v1";
+  var rowsBody = document.getElementById("rows");
+  var rowSeq = 0;
+
+  function won(n){ return Math.round(n).toLocaleString("ko-KR"); }
+  function parseNum(str){
+    if (typeof str !== "string") return 0;
+    var cleaned = str.replace(/[^0-9]/g, "");
+    return cleaned ? parseInt(cleaned, 10) : 0;
+  }
+
+  function sampleRows(){
+    return [
+      {name:"김민지", income:1200000},
+      {name:"박서준", income:980000},
+      {name:"이하늘", income:1600000}
+    ];
+  }
+
+  function loadRows(){
+    try{
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (raw){
+        var data = JSON.parse(raw);
+        if (data && Array.isArray(data.rows) && data.rows.length){
+          if (data.period) periodSelect.value = data.period;
+          return data.rows;
+        }
+      }
+    }catch(e){}
+    return sampleRows();
+  }
+
+  function saveRows(){
+    try{
+      var rows = collectRawRows();
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({period:periodSelect.value, rows:rows}));
+    }catch(e){}
+  }
+
+  function collectRawRows(){
+    return Array.prototype.map.call(rowsBody.querySelectorAll("tr"), function(tr){
+      return {
+        name: tr.querySelector(".f-name").value,
+        income: parseNum(tr.querySelector(".f-income").value)
+      };
+    });
+  }
+
+  function addRow(data){
+    data = data || {name:"", income:0};
+    rowSeq++;
+    var tr = document.createElement("tr");
+    tr.dataset.id = rowSeq;
+    tr.innerHTML =
+      '<td class="left">' + rowSeq + '</td>' +
+      '<td class="left"><input class="name-input f-name" type="text" placeholder="이름"></td>' +
+      '<td><input class="f-income" type="text" inputmode="numeric" placeholder="0"></td>' +
+      '<td class="hl-ei out-employee">0</td>' +
+      '<td class="hl-ei out-employer-ei">0</td>' +
+      '<td class="hl-ai out-ai-employee">0</td>' +
+      '<td class="hl-ai out-ai-employer">0</td>' +
+      '<td class="hl-ai out-flag"></td>' +
+      '<td class="out-employee-total">0</td>' +
+      '<td class="out-employer-total">0</td>' +
+      '<td class="total-cell out-grand">0</td>' +
+      '<td><button class="row-del" title="행 삭제" aria-label="행 삭제">×</button></td>';
+    rowsBody.appendChild(tr);
+    tr.querySelector(".f-name").value = data.name;
+    tr.querySelector(".f-income").value = data.income ? won(data.income) : "";
+
+    tr.querySelector(".row-del").addEventListener("click", function(){
+      tr.remove();
+      recalcAll();
+    });
+    var incomeInput = tr.querySelector(".f-income");
+    incomeInput.addEventListener("input", function(){
+      var caret = incomeInput.selectionStart;
+      var before = incomeInput.value.length;
+      incomeInput.value = incomeInput.value ? won(parseNum(incomeInput.value)) : "";
+      var after = incomeInput.value.length;
+      incomeInput.selectionStart = incomeInput.selectionEnd = Math.max(0, caret + (after - before));
+      recalcAll();
+    });
+    tr.querySelector(".f-name").addEventListener("input", recalcAll);
+    return tr;
+  }
+
+  function renumber(){
+    Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr, i){
+      tr.querySelector("td.left").textContent = i + 1;
+    });
+  }
+
+  function recalcAll(){
+    renumber();
+    var periodKey = periodSelect.value;
+    var sums = {employee:0, employerEi:0, aiEmployee:0, aiEmployer:0, employeeTotal:0, employerTotal:0, grand:0};
+    var first = null;
+
+    Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
+      var income = parseNum(tr.querySelector(".f-income").value);
+      if (!income){
+        tr.classList.remove("excluded");
+        tr.querySelector(".out-employee").textContent = "0";
+        tr.querySelector(".out-employer-ei").textContent = "0";
+        tr.querySelector(".out-ai-employee").textContent = "0";
+        tr.querySelector(".out-ai-employer").textContent = "0";
+        tr.querySelector(".out-flag").textContent = "";
+        tr.querySelector(".out-employee-total").textContent = "0";
+        tr.querySelector(".out-employer-total").textContent = "0";
+        tr.querySelector(".out-grand").textContent = "0";
+        return;
+      }
+      var r = calcPerson(income, periodKey);
+      tr.classList.toggle("excluded", r.ei.excluded);
+      tr.querySelector(".out-employee").textContent = won(r.ei.employeeCost);
+      tr.querySelector(".out-employer-ei").textContent = won(r.ei.employerCost);
+      tr.querySelector(".out-ai-employee").textContent = won(r.ai.employeeShare);
+      tr.querySelector(".out-ai-employer").textContent = won(r.ai.employerShare);
+      tr.querySelector(".out-flag").innerHTML = r.ei.excluded ? '<span class="flag">고용 제외</span>' : "";
+      tr.querySelector(".out-employee-total").textContent = won(r.employeeTotal);
+      tr.querySelector(".out-employer-total").textContent = won(r.employerTotal);
+      tr.querySelector(".out-grand").textContent = won(r.grandTotal);
+
+      sums.employee += r.ei.employeeCost;
+      sums.employerEi += r.ei.employerCost;
+      sums.aiEmployee += r.ai.employeeShare;
+      sums.aiEmployer += r.ai.employerShare;
+      sums.employeeTotal += r.employeeTotal;
+      sums.employerTotal += r.employerTotal;
+      sums.grand += r.grandTotal;
+
+      if (!first) first = {name: tr.querySelector(".f-name").value || "(이름 미입력)", income:income, r:r};
+    });
+
+    document.getElementById("sumEmployee").textContent = won(sums.employee);
+    document.getElementById("sumEmployerEi").textContent = won(sums.employerEi);
+    document.getElementById("sumAiEmployee").textContent = won(sums.aiEmployee);
+    document.getElementById("sumAiEmployer").textContent = won(sums.aiEmployer);
+    document.getElementById("sumEmployeeTotal").textContent = won(sums.employeeTotal);
+    document.getElementById("sumEmployerTotal").textContent = won(sums.employerTotal);
+    document.getElementById("sumGrand").textContent = won(sums.grand);
+
+    renderExplain(first, periodKey);
+    saveRows();
+  }
+
+  function renderExplain(first, periodKey){
+    var el = document.getElementById("checkExplain");
+    if (!first){
+      el.textContent = "강사를 한 명 이상 입력하면, 그중 첫 번째 강사의 계산 과정을 근로복지공단 계산기 항목 순서 그대로 여기에 풀어서 보여줍니다. 공식 사이트 결과와 대조해 검증할 때 사용하세요.";
+      return;
+    }
+    var p = PERIODS.filter(function(x){return x.key === periodKey;})[0];
+    var ei = first.r.ei, ai = first.r.ai;
+    var lines = [];
+    lines.push("<strong>" + first.name + "</strong> · " + p.label + " · 월 지급액 " + won(first.income) + "원");
+    lines.push("[고용보험] 필요경비 " + won(ei.expense) + "원 → 월보수액 " + won(ei.monthlySalary) + "원 → 근로자 " + won(ei.employeeCost) + "원 · 사업주 " + won(ei.employerCost) + "원" + (ei.excluded ? " (월보수 80만원 미만, 적용제외)" : ""));
+    lines.push("[산재보험] 필요경비 " + won(ai.necessaryExpenses) + "원 → 산정기준액 " + won(ai.base) + "원 → " + (ai.employeeShare > 0 ? ("강사 " + won(ai.employeeShare) + "원 · 사업주 " + won(ai.employerShare) + "원 (1/2씩)") : ("사업주 전액 " + won(ai.employerShare) + "원")));
+    el.innerHTML = lines.join("<br>");
+  }
+
+  // ---- 초기 로드 ----
+  loadRows().forEach(function(d){ addRow(d); });
+  recalcAll();
+
+  periodSelect.addEventListener("change", recalcAll);
+
+  document.getElementById("addRowBtn").addEventListener("click", function(){
+    addRow();
+    recalcAll();
+    var inputs = rowsBody.querySelectorAll("tr:last-child .name-input");
+    if (inputs.length) inputs[0].focus();
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    if (!confirm("입력한 모든 강사 정보를 지울까요?")) return;
+    rowsBody.innerHTML = "";
+    addRow();
+    recalcAll();
+  });
+
+  function parseBulk(text){
+    return text.split("\n").map(function(line){ return line.trim(); })
+      .filter(function(line){ return line.length; })
+      .map(function(line){
+        var parts = line.indexOf("\t") >= 0 ? line.split("\t") : line.split(",");
+        parts = parts.map(function(s){ return s.trim(); });
+        return {
+          name: parts[0] || "",
+          income: parseNum(parts[1] || "")
+        };
+      })
+      .filter(function(r){ return r.name || r.income; });
+  }
+
+  document.getElementById("bulkAddBtn").addEventListener("click", function(){
+    var rows = parseBulk(document.getElementById("bulkInput").value);
+    rows.forEach(function(r){ addRow(r); });
+    recalcAll();
+    document.getElementById("bulkInput").value = "";
+  });
+
+  document.getElementById("bulkReplaceBtn").addEventListener("click", function(){
+    var rows = parseBulk(document.getElementById("bulkInput").value);
+    if (!rows.length) return;
+    rowsBody.innerHTML = "";
+    rows.forEach(function(r){ addRow(r); });
+    recalcAll();
+    document.getElementById("bulkInput").value = "";
+  });
+
+  document.getElementById("copyBtn").addEventListener("click", function(){
+    var header = ["이름","월지급액","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
+    var lines = [header.join("\t")];
+    Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
+      var income = parseNum(tr.querySelector(".f-income").value);
+      if (!income) return;
+      lines.push([
+        tr.querySelector(".f-name").value,
+        tr.querySelector(".f-income").value,
+        tr.querySelector(".out-employee").textContent,
+        tr.querySelector(".out-employer-ei").textContent,
+        tr.querySelector(".out-ai-employee").textContent,
+        tr.querySelector(".out-ai-employer").textContent,
+        tr.querySelector(".out-employee-total").textContent,
+        tr.querySelector(".out-employer-total").textContent,
+        tr.querySelector(".out-grand").textContent
+      ].join("\t"));
+    });
+    lines.push(["합계","",
+      document.getElementById("sumEmployee").textContent,
+      document.getElementById("sumEmployerEi").textContent,
+      document.getElementById("sumAiEmployee").textContent,
+      document.getElementById("sumAiEmployer").textContent,
+      document.getElementById("sumEmployeeTotal").textContent,
+      document.getElementById("sumEmployerTotal").textContent,
+      document.getElementById("sumGrand").textContent
+    ].join("\t"));
+    var text = lines.join("\n");
+
+    function flashMsg(){
+      var msg = document.getElementById("copyMsg");
+      msg.classList.add("show");
+      setTimeout(function(){ msg.classList.remove("show"); }, 2200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(flashMsg, function(){ fallbackCopy(text, flashMsg); });
+    } else {
+      fallbackCopy(text, flashMsg);
+    }
+  });
+
+  function fallbackCopy(text, cb){
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand("copy"); }catch(e){}
+    document.body.removeChild(ta);
+    cb();
+  }
+})();
+</script>
+</body>
+</html>
