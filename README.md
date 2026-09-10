@@ -34,6 +34,8 @@ comwel.or.kr은 **해외 IP를 지역 단위로 차단**합니다. 2026-09-10에
 3. 배포가 끝나면 `https://<프로젝트명>.vercel.app/api/check`를 열어 `"status":"ok"`, `"region":"icn1"`이 나오는지 확인한다.
 4. `index.html`의 `LIVE_CHECK_URL`에 그 주소를 넣고 커밋·푸시한다.
 
+현재 연결된 주소: <https://afterschool-insurance-calc.vercel.app/api/check> (해시가 붙은 개별 배포 주소는 Vercel 로그인 보호가 걸려 있어 페이지에서 쓸 수 없으므로 반드시 이 운영 주소를 쓴다)
+
 이후에는 `main`에 푸시할 때마다 Vercel이 자동으로 다시 배포하므로 `known-rates.json`을 고치면 점검 기준도 자동으로 따라갑니다.
 
 ### 수동 점검 (관리자 PC, 예비용)

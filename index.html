@@ -487,7 +487,8 @@
   // 1순위: Vercel 서울 리전의 실시간 점검 API(api/check.mjs). comwel.or.kr이 해외 IP를 막아
   //        GitHub Pages·Actions에서는 직접 조회할 수 없어서, 한국 리전 함수가 대신 조회한다.
   // 2순위: 관리자가 PC에서 수동 점검해 커밋한 rate-status.json (실시간 점검 서버가 응답하지 않을 때)
-  var LIVE_CHECK_URL = ""; // Vercel 배포 후 "https://<프로젝트>.vercel.app/api/check" 형태로 입력
+  // 해시가 붙은 개별 배포 주소(…-xxxx-seongjun-han.vercel.app)는 Vercel 로그인 보호가 걸려 있으므로 반드시 운영 주소를 쓴다.
+  var LIVE_CHECK_URL = "https://afterschool-insurance-calc.vercel.app/api/check";
   var OFFICIAL_CALCS = [
     {label:"고용보험 모의계산기", href:"https://www.comwel.or.kr/comwel/bohumcal2.jsp"},
     {label:"산재보험 모의계산기", href:"https://www.comwel.or.kr/comwel/bohumcal4.jsp"}
