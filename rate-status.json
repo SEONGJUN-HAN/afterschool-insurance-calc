@@ -1,5 +1,7 @@
 {
-  "upToDate": true,
+  "upToDate": false,
   "checkedAt": "2026-09-10",
-  "issues": []
+  "issues": [
+    "자동 점검 스크립트 실행 중 오류가 발생했습니다: 고용보험 계산기 요청 실패 (HTTP 400) — 공식 계산기를 직접 확인해 주세요."
+  ]
 }
