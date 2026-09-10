@@ -234,27 +234,13 @@
   .hint{font-size:12px; color:var(--ink-faint); margin-top:8px; line-height:1.6;}
 
   .check-panel{
-    background:var(--surface); border:1px solid var(--accent-ai-bg-strong); border-radius:12px;
-    padding:18px 20px; margin-bottom:22px; box-shadow:var(--shadow);
+    background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:16px 18px; margin-bottom:22px; box-shadow:var(--shadow);
   }
-  .check-panel h2{
-    font-size:14px; margin:0 0 8px; color:var(--accent-ai); font-weight:700;
-  }
-  .check-panel > p.hint{margin-top:0; margin-bottom:14px; font-size:12.5px;}
-  .check-panel > p.hint:last-child{margin-top:14px; margin-bottom:0;}
-  .check-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
-  @media (max-width:800px){.check-grid{grid-template-columns:1fr;}}
-  .check-card{
-    background:var(--accent-ai-bg); border:1px solid var(--accent-ai-bg-strong); border-radius:9px; padding:13px 15px;
-  }
-  .check-card-title{font-weight:700; font-size:13px; color:var(--accent-ai); margin-bottom:6px;}
-  .check-card p{font-size:12.5px; color:var(--ink-dim); margin:0 0 8px; line-height:1.5;}
-  .check-values{
-    font-size:12.5px; font-weight:600; color:var(--ink); background:var(--surface); border-radius:6px;
-    padding:7px 9px; margin-bottom:9px; font-variant-numeric:tabular-nums; line-height:1.5;
-  }
-  .check-values-sub{font-weight:400; color:var(--ink-faint); font-size:11.5px;}
-  .check-link{display:inline-block; font-size:12.5px; font-weight:600; color:var(--accent-ai);}
+  .check-panel h2{font-size:13px; margin:0 0 8px; color:var(--ink-dim); font-weight:700; letter-spacing:.02em;}
+  .check-panel p{margin:0; font-size:12.5px; color:var(--ink-dim); line-height:1.7;}
+  .check-panel .check-links{margin-top:8px;}
+  .check-panel a{color:var(--accent-ei); font-weight:600;}
 
   footer{
     border-top:1px solid var(--border); padding-top:16px; font-size:12.5px; color:var(--ink-dim); line-height:1.8;
@@ -278,7 +264,7 @@
     <div class="heading-block">
       <div class="eyebrow">근로복지공단 노무제공자 보험료 모의계산 · 일괄판</div>
       <h1>방과후강사 보험료 일괄계산기</h1>
-      <p class="sub">여러 강사의 월 지급액을 한 번에 넣으면 고용보험과 산재보험을 각각 계산합니다. 근로복지공단 모의계산기의 방과후 학교강사 기준을 그대로 적용했으며, 산재보험은 2024년 1월 귀속분부터 강사·사업주가 1/2씩 분담하는 방식을 반영했습니다.</p>
+      <p class="sub">여러 강사의 월 지급액을 한 번에 넣으면 고용보험료와 산재보험료를 강사·사업주 부담분으로 나눠 계산합니다. 근로복지공단 노무제공자 보험료 모의계산기의 방과후 학교강사 기준을 그대로 적용했습니다.</p>
       <span class="job-badge">직종 고정 · 방과후 학교강사</span>
     </div>
     <div class="period-box">
@@ -302,8 +288,8 @@
           <tr class="group-row">
             <th colspan="3"></th>
             <th class="g-rep">고용·산재 공통</th>
-            <th class="g-ei" colspan="2">고용보험</th>
-            <th class="g-ai" colspan="3">산재보험</th>
+            <th class="g-ei" colspan="3">고용보험</th>
+            <th class="g-ai" colspan="2">산재보험</th>
             <th colspan="4"></th>
           </tr>
           <tr class="col-row">
@@ -311,12 +297,12 @@
             <th class="left" style="min-width:120px">이름</th>
             <th style="min-width:130px">월 지급액(사업소득)</th>
             <th class="hl-rep" style="min-width:120px">월보수액<br><span class="col-note">(고용·산재 신고용)</span></th>
-            <th class="hl-ei">근로자 부담</th>
+            <th class="hl-ei">강사 부담</th>
             <th class="hl-ei">사업주 부담</th>
+            <th class="hl-ei" style="width:30px"></th>
             <th class="hl-ai">강사 부담</th>
             <th class="hl-ai">사업주 부담</th>
-            <th class="hl-ai" style="width:30px"></th>
-            <th>강사 본인 총부담</th>
+            <th>강사 총부담</th>
             <th>사업주 총부담</th>
             <th class="total-cell-head">월 보험료 총액</th>
             <th style="width:30px"></th>
@@ -329,9 +315,9 @@
             <td id="sumMonthlySalary">0</td>
             <td id="sumEmployee">0</td>
             <td id="sumEmployerEi">0</td>
+            <td></td>
             <td id="sumAiEmployee">0</td>
             <td id="sumAiEmployer">0</td>
-            <td></td>
             <td id="sumEmployeeTotal">0</td>
             <td id="sumEmployerTotal">0</td>
             <td class="total-cell" id="sumGrand">0</td>
@@ -354,42 +340,30 @@
     </div>
     <div class="panel">
       <h2>산정 방식 확인</h2>
-      <p class="hint" id="checkExplain">강사를 한 명 이상 입력하면, 그중 첫 번째 강사의 계산 과정을 근로복지공단 계산기 항목 순서 그대로 여기에 풀어서 보여줍니다. 공식 사이트 결과와 대조해 검증할 때 사용하세요.</p>
+      <p class="hint" id="checkExplain">월 지급액을 입력한 첫 번째 강사의 계산 과정을 공식 모의계산기의 항목 순서대로 보여줍니다. 공식 계산기 결과와 대조할 때 쓰세요.</p>
     </div>
   </div>
 
   <div class="check-panel">
-    <h2>이 계산기, 지금도 최신 요율일까?</h2>
-    <p class="hint">저장소 관리자가 필요할 때 점검 스크립트를 실행하면 결과가 이 페이지 맨 위 배너에 표시됩니다(comwel.or.kr이 해외 접속을 막고 있어 완전 자동화는 어려움). 그래도 직접 확인하고 싶다면 아래 공식 표에서 <strong>"방과후학교강사"</strong> 한 줄만 보면 됩니다.</p>
-    <div class="check-grid">
-      <div class="check-card">
-        <div class="check-card-title">① 고용보험 공제율·요율표</div>
-        <p>근로복지공단이 공시하는 표에서 "방과후학교강사" 줄의 공제율이 아래 값과 같은지 확인하세요.</p>
-        <div class="check-values">이 계산기 값 — 23.5% · 16.5% · 16.5% · 14.9% · 19.3%<br><span class="check-values-sub">(2023.1~2023.6 / 2023.7~2024.6 / 2024.7~2025.6 / 2025.7~2026.6 / 2026.7~2027.6)</span></div>
-        <a class="check-link" href="https://www.comwel.or.kr/comwel/paym/spec/spec7.jsp" target="_blank" rel="noopener">공식 표 열기 → 근로복지공단 &gt; 노무제공자 고용보험 &gt; 보험료 산정 및 부과 ↗</a>
-      </div>
-      <div class="check-card">
-        <div class="check-card-title">② 산재보험 공제율·요율표</div>
-        <p>같은 방식으로 "방과후학교강사"의 공제율·직종별요율(6‰)·출퇴근재해요율이 같은지 확인하세요.</p>
-        <div class="check-values">이 계산기 값 — 공제율 16.5%·16.5%·14.9%·19.3%, 직종요율 6‰, 출퇴근재해요율 0.6‰(2023년 1‰), 2024년 1월 귀속분부터 강사·사업주 1/2씩 분담</div>
-        <a class="check-link" href="https://www.comwel.or.kr/comwel/paym/spec/spec3.jsp" target="_blank" rel="noopener">공식 표 열기 → 근로복지공단 &gt; 노무제공자 산재보험 &gt; 보험료 산정 및 부과 ↗</a>
-      </div>
-    </div>
-    <p class="hint">표의 값이 위와 다르면 요율이 개정된 것입니다. 아래 공식 모의계산기로 1인 금액을 대조해 당분간 이용해 주세요.
+    <h2>요율 자동 점검</h2>
+    <p>페이지를 열면 근로복지공단 고용·산재보험 모의계산기의 방과후 학교강사 기준이 이 계산기에 반영된 기준과 같은지 자동으로 대조해, 결과와 점검 시각을 맨 위 배너에 표시합니다. 배너에 변경 경고가 뜨면 요율이 개정된 것이므로, 이 계산기가 갱신될 때까지는 공식 계산기로 금액을 확인해 주세요.</p>
+    <p class="check-links">
       <a href="https://www.comwel.or.kr/comwel/bohumcal2.jsp" target="_blank" rel="noopener">고용보험 모의계산기 ↗</a> ·
-      <a href="https://www.comwel.or.kr/comwel/bohumcal4.jsp" target="_blank" rel="noopener">산재보험 모의계산기 ↗</a>
+      <a href="https://www.comwel.or.kr/comwel/bohumcal4.jsp" target="_blank" rel="noopener">산재보험 모의계산기 ↗</a> ·
+      <a href="https://www.comwel.or.kr/comwel/paym/spec/spec7.jsp" target="_blank" rel="noopener">고용보험 공제율·요율표 ↗</a> ·
+      <a href="https://www.comwel.or.kr/comwel/paym/spec/spec3.jsp" target="_blank" rel="noopener">산재보험 공제율·요율표 ↗</a>
     </p>
   </div>
 
   <footer>
     <div class="legend">
-      <span><span class="dot rep"></span>월보수액 — 월 지급액에서 필요경비를 뺀 금액으로, 고용보험·산재보험 모두 이 금액으로 신고(2023년 상반기는 두 보험의 공제율이 달라 따로 표시)</span>
-      <span><span class="dot ei"></span>고용보험 — 근로자·사업주 각 0.8% 분담, 필요경비 제외 후 월보수액 기준</span>
-      <span><span class="dot ai"></span>산재보험 — 2023년은 사업주 전액 부담, 2024년 1월 귀속분부터는 강사·사업주가 1/2씩 분담</span>
+      <span><span class="dot rep"></span>월보수액 — 월 지급액에서 필요경비(직종별 공제율)를 뺀 금액. 고용·산재 모두 이 금액으로 신고합니다(2023년 상반기만 두 보험의 공제율이 달라 따로 표시).</span>
+      <span><span class="dot ei"></span>고용보험 — 월보수액의 0.8%씩 강사·사업주 부담. 월보수액 80만 원 미만은 적용 제외, 80만~133만 원은 133만 원 기준으로 산정</span>
+      <span><span class="dot ai"></span>산재보험 — 2023년은 사업주 전액 부담, 2024년 1월 귀속분부터 강사·사업주가 1/2씩 부담</span>
     </div>
     <div><strong>비과세소득 입력란이 없는 이유</strong> — 공식 계산기의 "월 비과세소득" 항목은 소득세법 제12조제2호(사업소득)·제5호(기타소득)가 정한 비과세소득을 뺀다는 뜻인데, 그 목록(농어가부업소득·조림소득·훈장 부상금·보훈급여금 등)에 방과후강사료가 해당하는 경우는 없습니다. 그래서 이 계산기는 비과세소득을 0원으로 고정했습니다. 드물게 해당 사항이 있다고 판단되면 근로복지공단(1588-0075)에 확인 후 공식 모의계산기를 직접 이용해 주세요.</div>
-    <div>근거: 근로복지공단 「노무제공자 고용보험·산재보험 — 보험료 산정 및 부과」 공식 고시 표 및 노무제공자 보험료 모의계산기의 방과후 학교강사 공제율·요율·상한액을 그대로 반영했습니다.</div>
-    <div>실제 신고·부과 금액은 월 보수 신고 방식 등에 따라 공식 계산기 결과와 다를 수 있습니다.</div>
+    <div>근거: 근로복지공단 노무제공자 고용보험·산재보험 모의계산기의 방과후 학교강사 공제율·요율·상한액.</div>
+    <div>이 계산기는 참고용이며, 실제 부과 금액은 신고 내용에 따라 달라질 수 있습니다.</div>
   </footer>
 </div>
 
@@ -456,7 +430,7 @@
     var employerCost = roundDownToTen(Math.trunc(basis * EI_PREMIUM_RATE));
     if (employeeCost > cfg.cap) employeeCost = cfg.cap;
     if (employerCost > cfg.cap) employerCost = cfg.cap;
-    return {expense:expense, monthlySalary:monthlySalary, employeeCost:employeeCost, employerCost:employerCost, excluded:false};
+    return {expense:expense, monthlySalary:monthlySalary, basis:basis, employeeCost:employeeCost, employerCost:employerCost, excluded:false};
   }
 
   function calcAccidentInsurance(income, periodKey){
@@ -523,7 +497,7 @@
     var icon, tone;
     if (!status){
       tone = "unknown"; icon = "ℹ️";
-      body.appendChild(el("span", null, "요율 점검 결과를 불러오지 못했습니다(오프라인 상태일 수 있음). 아래 \"셀프체크\" 표나 공식 계산기로 직접 확인해 주세요."));
+      body.appendChild(el("span", null, "요율 점검 결과를 불러오지 못했습니다(오프라인 상태일 수 있음). 공식 계산기로 직접 확인해 주세요."));
       body.appendChild(officialLinks());
     } else if (status.status === "ok"){
       tone = "ok"; icon = "✅";
@@ -543,7 +517,7 @@
       tone = "unknown"; icon = "ℹ️";
       body.appendChild(document.createTextNode("마지막 점검(" + status.checkedAt + ")이 완료되지 못했습니다(사이트 접속 실패 등). "));
       body.appendChild(el("strong", null, "요율이 바뀐 것은 아닐 수 있습니다."));
-      body.appendChild(document.createTextNode(" 아래 \"셀프체크\" 표나 공식 계산기로 직접 확인해 주세요."));
+      body.appendChild(document.createTextNode(" 공식 계산기로 직접 확인해 주세요."));
       body.appendChild(officialLinks());
     }
     banner.className = "status-banner " + tone;
@@ -643,9 +617,9 @@
       '<td class="hl-rep out-monthly-salary">0</td>' +
       '<td class="hl-ei out-employee">0</td>' +
       '<td class="hl-ei out-employer-ei">0</td>' +
+      '<td class="hl-ei out-flag"></td>' +
       '<td class="hl-ai out-ai-employee">0</td>' +
       '<td class="hl-ai out-ai-employer">0</td>' +
-      '<td class="hl-ai out-flag"></td>' +
       '<td class="out-employee-total">0</td>' +
       '<td class="out-employer-total">0</td>' +
       '<td class="total-cell out-grand">0</td>' +
@@ -752,15 +726,17 @@
   function renderExplain(first, periodKey){
     var el = document.getElementById("checkExplain");
     if (!first){
-      el.textContent = "강사를 한 명 이상 입력하면, 그중 첫 번째 강사의 계산 과정을 근로복지공단 계산기 항목 순서 그대로 여기에 풀어서 보여줍니다. 공식 사이트 결과와 대조해 검증할 때 사용하세요.";
+      el.textContent = "월 지급액을 입력한 첫 번째 강사의 계산 과정을 공식 모의계산기의 항목 순서대로 보여줍니다. 공식 계산기 결과와 대조할 때 쓰세요.";
       return;
     }
     var p = PERIODS.filter(function(x){return x.key === periodKey;})[0];
     var ei = first.r.ei, ai = first.r.ai;
     var lines = [];
     lines.push("<strong>" + first.name + "</strong> · " + p.label + " · 월 지급액 " + won(first.income) + "원");
-    lines.push("[고용보험] 필요경비 " + won(ei.expense) + "원 → 월보수액 " + won(ei.monthlySalary) + "원 → 근로자 " + won(ei.employeeCost) + "원 · 사업주 " + won(ei.employerCost) + "원" + (ei.excluded ? " (월보수 80만원 미만, 적용제외)" : ""));
-    lines.push("[산재보험] 필요경비 " + won(ai.necessaryExpenses) + "원 → 산정기준액 " + won(ai.base) + "원 → " + (ai.employeeShare > 0 ? ("강사 " + won(ai.employeeShare) + "원 · 사업주 " + won(ai.employerShare) + "원 (1/2씩)") : ("사업주 전액 " + won(ai.employerShare) + "원")));
+    var eiNote = ei.excluded ? " (월보수액 80만 원 미만이라 적용 제외)"
+      : (ei.basis !== ei.monthlySalary ? " (월보수액 133만 원 미만이라 133만 원 기준으로 산정)" : "");
+    lines.push("[고용보험] 필요경비 " + won(ei.expense) + "원 → 월보수액 " + won(ei.monthlySalary) + "원 → 강사 " + won(ei.employeeCost) + "원 · 사업주 " + won(ei.employerCost) + "원" + eiNote);
+    lines.push("[산재보험] 필요경비 " + won(ai.necessaryExpenses) + "원 → 월보수액 " + won(ai.base) + "원 → " + (ai.employeeShare > 0 ? ("강사 " + won(ai.employeeShare) + "원 · 사업주 " + won(ai.employerShare) + "원 (1/2씩)") : ("사업주 전액 " + won(ai.employerShare) + "원")));
     el.innerHTML = lines.join("<br>");
   }
 
@@ -815,7 +791,7 @@
   });
 
   document.getElementById("copyBtn").addEventListener("click", function(){
-    var header = ["이름","월지급액","월보수액(고용·산재 신고용)","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
+    var header = ["이름","월지급액","월보수액(고용·산재 신고용)","고용_강사부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사총부담","사업주총부담","월보험료총액"];
     var lines = [header.join("\t")];
     Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
       var income = parseNum(tr.querySelector(".f-income").value);

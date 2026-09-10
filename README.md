@@ -60,7 +60,7 @@ comwel.or.kr은 **해외 IP를 지역 단위로 차단**합니다. 2026-09-10에
 
 ### 요율이 바뀌었을 때(`status: "changed"`) 갱신하는 법
 
-1. 점검 실행 시 콘솔에 출력된 내용, 또는 `index.html` 안의 "셀프체크" 표에 걸린 근로복지공단 공식 표 링크로 실제 변경 내용을 확인한다.
+1. 점검 실행 시 콘솔에 출력된 내용, 또는 페이지 하단 "요율 자동 점검" 안내에 걸린 근로복지공단 공식 계산기·요율표 링크로 실제 변경 내용을 확인한다.
 2. `index.html`의 `EI`, `AI` 상수(공제율·요율·상한액)를 새 값으로 고친다.
 3. `scripts/check-and-publish.cmd`를 한 번 더 실행한다.
 4. 콘솔 맨 아래 출력되는 `eiLatestPeriod` / `eiHash` / `aiLatestPeriod` / `aiHash` 값을 `known-rates.json`에 그대로 옮겨 적고 `verifiedAt`을 오늘 날짜로 바꾼다.
