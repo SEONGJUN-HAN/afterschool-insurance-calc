@@ -1,9 +1,12 @@
 // 근로복지공단 노무제공자 보험료 모의계산기의 "방과후 학교강사" 계산 로직이
-// 마지막 확인 시점(known-rates.json)과 달라졌는지 매달 자동으로 점검한다.
-// 브라우저가 아니라 이 스크립트(Node.js, GitHub Actions에서 실행)가 직접 comwel.or.kr에
-// 접속하므로 브라우저의 동일-출처 정책(CORS)에 걸리지 않는다.
+// 마지막 확인 시점(known-rates.json)과 달라졌는지 점검한다.
+//
+// 주의: comwel.or.kr은 해외/클라우드 데이터센터 IP에서의 접속을 방화벽 단에서
+// 차단하는 것으로 확인됨(GitHub Actions 클라우드 러너에서 실행 시 HTTP 400).
+// 그래서 이 스크립트는 한국 IP를 쓰는 사용자의 PC에서 직접 실행해야 한다.
+// (scripts/check-and-publish.cmd 를 더블클릭하면 됨)
 
-import { readFileSync, writeFileSync, appendFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 
 const EI_URL = "https://www.comwel.or.kr/comwel/bohumcal2.jsp"; // 고용보험 모의계산기
@@ -36,13 +39,6 @@ function newestSelectValue(html, selectId) {
   return values.reduce((best, v) => (periodSortKey(v) > periodSortKey(best) ? v : best));
 }
 
-function setOutput(name, value) {
-  const file = process.env.GITHUB_OUTPUT;
-  if (file) appendFileSync(file, `${name}=${value}\n`);
-}
-
-// GitHub Actions 러너의 기본 User-Agent로는 일부 정부기관 사이트가 접속을 막거나
-// 다른 응답을 줄 수 있어, 일반 브라우저처럼 보이는 헤더를 붙여서 요청한다.
 async function fetchHtml(url, label) {
   const res = await fetch(url, {
     headers: {
@@ -53,13 +49,17 @@ async function fetchHtml(url, label) {
     },
   });
   const text = await res.text();
-  // 워크플로 로그에서만 보이는 진단 정보(커밋되는 파일에는 남기지 않음).
   console.log(`[진단] ${label} 응답 상태: ${res.status}, 본문 길이: ${text.length}자`);
   if (!res.ok) {
     console.log(`[진단] ${label} 응답 앞부분 500자:\n${text.slice(0, 500)}`);
     throw new Error(`${label} 요청 실패 (HTTP ${res.status})`);
   }
   return text;
+}
+
+function writeStatus(status) {
+  writeFileSync("rate-status.json", JSON.stringify(status, null, 2) + "\n");
+  console.log(JSON.stringify(status, null, 2));
 }
 
 async function main() {
@@ -100,10 +100,7 @@ async function main() {
     issues.push("산재보험 계산기의 방과후 학교강사 계산 로직 내용이 마지막 확인 시점과 달라짐");
   }
 
-  const status = { upToDate: issues.length === 0, checkedAt: today, issues };
-  writeFileSync("rate-status.json", JSON.stringify(status, null, 2) + "\n");
-  setOutput("changed", String(issues.length > 0));
-  console.log(JSON.stringify(status, null, 2));
+  writeStatus({ status: issues.length === 0 ? "ok" : "changed", checkedAt: today, issues });
 
   // index.html의 요율표를 새 값으로 갱신했다면, 아래 값을 known-rates.json에 그대로 복사해 넣어
   // (verifiedAt은 오늘 날짜로) 기준선을 새로 잡아 주세요. 이후부터 이 값과 다시 비교합니다.
@@ -113,12 +110,12 @@ async function main() {
 
 main().catch((err) => {
   const today = new Date().toISOString().slice(0, 10);
-  const status = {
-    upToDate: false,
+  // 접속 실패 등 점검 자체가 안 된 경우 — "요율이 바뀌었다"는 뜻이 아니므로
+  // status를 changed와 구분해서 기록한다(index.html이 배너 문구를 다르게 보여줌).
+  writeStatus({
+    status: "check_failed",
     checkedAt: today,
-    issues: [`자동 점검 스크립트 실행 중 오류가 발생했습니다: ${err.message} — 공식 계산기를 직접 확인해 주세요.`],
-  };
-  writeFileSync("rate-status.json", JSON.stringify(status, null, 2) + "\n");
-  setOutput("changed", "true");
+    issues: [`점검 자체가 실패했습니다: ${err.message} — 요율이 바뀐 것은 아닐 수 있습니다. 공식 계산기를 직접 확인해 주세요.`],
+  });
   console.error(err);
 });

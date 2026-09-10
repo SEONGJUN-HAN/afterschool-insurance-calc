@@ -341,7 +341,7 @@
 
   <div class="check-panel">
     <h2>이 계산기, 지금도 최신 요율일까?</h2>
-    <p class="hint">이 저장소는 매달 1일 GitHub Actions로 근로복지공단 공식 계산기를 자동 점검합니다. 변경이 감지되면 이 페이지 맨 위에 배너로 표시됩니다. 그래도 직접 확인하고 싶다면 아래 공식 표에서 <strong>"방과후학교강사"</strong> 한 줄만 보면 됩니다.</p>
+    <p class="hint">저장소 관리자가 필요할 때 점검 스크립트를 실행하면 결과가 이 페이지 맨 위 배너에 표시됩니다(comwel.or.kr이 해외 접속을 막고 있어 완전 자동화는 어려움). 그래도 직접 확인하고 싶다면 아래 공식 표에서 <strong>"방과후학교강사"</strong> 한 줄만 보면 됩니다.</p>
     <div class="check-grid">
       <div class="check-card">
         <div class="check-card-title">① 고용보험 공제율·요율표</div>
@@ -467,13 +467,17 @@
       el.hidden = false;
       return;
     }
-    if (status.upToDate){
+    if (status.status === "ok"){
       el.className = "status-banner ok";
-      el.innerHTML = '<span class="icon">✅</span><span><strong>최신 요율로 확인됨</strong> · 마지막 자동 점검: ' + status.checkedAt + '</span>';
-    } else {
+      el.innerHTML = '<span class="icon">✅</span><span><strong>최신 요율로 확인됨</strong> · 마지막 점검: ' + status.checkedAt + '</span>';
+    } else if (status.status === "changed"){
       el.className = "status-banner warn";
       var items = (status.issues || []).map(function(i){ return "<li>" + i + "</li>"; }).join("");
-      el.innerHTML = '<span class="icon">⚠️</span><div><strong>근로복지공단 요율에 변경이 감지되었습니다</strong>(자동 점검: ' + status.checkedAt + '). 계산 결과가 최신이 아닐 수 있으니 아래 공식 계산기와 대조해 주세요.<ul>' + items + '</ul></div>';
+      el.innerHTML = '<span class="icon">⚠️</span><div><strong>근로복지공단 요율에 변경이 감지되었습니다</strong>(점검일: ' + status.checkedAt + '). 계산 결과가 최신이 아닐 수 있으니 아래 공식 계산기와 대조해 주세요.<ul>' + items + '</ul></div>';
+    } else {
+      // status === "check_failed" 등: 점검 자체가 안 된 것이지, 요율이 바뀐 게 확인된 건 아님
+      el.className = "status-banner unknown";
+      el.innerHTML = '<span class="icon">ℹ️</span><span>지난 점검(' + status.checkedAt + ')이 완료되지 못했습니다(사이트 접속 실패 등). <strong>요율이 바뀐 것은 아닐 수 있습니다.</strong> 아래 "셀프체크" 표로 직접 확인해 주세요.</span>';
     }
     el.hidden = false;
   }
