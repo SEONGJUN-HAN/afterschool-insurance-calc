@@ -22,6 +22,9 @@
     --accent-ai:#96502e;
     --accent-ai-bg:#f3e8de;
     --accent-ai-bg-strong:#e9d5c2;
+    --accent-rep:#5d4a82;
+    --accent-rep-bg:#ece7f4;
+    --accent-rep-bg-strong:#dcd3ec;
     --warn:#a13a2f;
     --warn-bg:#fbe9e5;
     --warn-border:#e5b6ac;
@@ -46,6 +49,9 @@
       --accent-ai:#d59567;
       --accent-ai-bg:#3a2c20;
       --accent-ai-bg-strong:#4a3626;
+      --accent-rep:#b9a6dc;
+      --accent-rep-bg:#2e2839;
+      --accent-rep-bg-strong:#3c344b;
       --warn:#e28577;
       --warn-bg:#3c231f;
       --warn-border:#6b3a30;
@@ -70,6 +76,9 @@
     --accent-ai:#d59567;
     --accent-ai-bg:#3a2c20;
     --accent-ai-bg-strong:#4a3626;
+    --accent-rep:#b9a6dc;
+    --accent-rep-bg:#2e2839;
+    --accent-rep-bg-strong:#3c344b;
     --warn:#e28577;
     --warn-bg:#3c231f;
     --warn-border:#6b3a30;
@@ -101,6 +110,9 @@
   .status-banner .icon{font-size:16px; line-height:1.4;}
   .status-banner ul{margin:6px 0 0; padding-left:18px;}
   .status-banner strong{font-weight:700;}
+  .status-banner .source{color:var(--ink-dim);}
+  .status-banner .links{margin-top:4px;}
+  .status-banner a{color:inherit; font-weight:600;}
 
   header{
     display:flex; flex-wrap:wrap; gap:20px 32px; align-items:flex-end; justify-content:space-between;
@@ -165,6 +177,7 @@
   }
   thead tr.group-row th.g-ei{background:var(--accent-ei-bg); color:var(--accent-ei);}
   thead tr.group-row th.g-ai{background:var(--accent-ai-bg); color:var(--accent-ai);}
+  thead tr.group-row th.g-rep{background:var(--accent-rep-bg); color:var(--accent-rep);}
   thead tr.col-row th{
     font-size:12.5px; font-weight:600; color:var(--ink-dim); text-align:right;
     padding:9px 10px; border-bottom:2px solid var(--border-strong); white-space:nowrap;
@@ -172,6 +185,7 @@
   thead tr.col-row th.left{text-align:left;}
   thead tr.col-row th.hl-ei{background:var(--accent-ei-bg);}
   thead tr.col-row th.hl-ai{background:var(--accent-ai-bg);}
+  thead tr.col-row th.hl-rep{background:var(--accent-rep-bg); color:var(--accent-rep);}
   thead tr.col-row .col-note{font-weight:400; color:var(--ink-faint); font-size:10.5px;}
   tbody td{
     padding:7px 10px; border-bottom:1px solid var(--border); text-align:right; font-size:13.5px;
@@ -182,6 +196,9 @@
   tbody tr.excluded td{color:var(--ink-faint);}
   tbody td.hl-ei{background:color-mix(in srgb, var(--accent-ei-bg) 55%, transparent);}
   tbody td.hl-ai{background:color-mix(in srgb, var(--accent-ai-bg) 55%, transparent);}
+  tbody td.hl-rep{background:color-mix(in srgb, var(--accent-rep-bg) 70%, transparent); font-weight:600;}
+  .split-line{display:block; font-size:12px; line-height:1.45;}
+  .split-line .tag{font-weight:600; color:var(--ink-faint); margin-right:4px;}
   tbody td.total-cell{font-weight:700; color:var(--ink);}
   tbody input{
     width:100%; border:1px solid transparent; background:transparent; text-align:right;
@@ -248,6 +265,7 @@
   footer .dot{width:9px; height:9px; border-radius:3px; display:inline-block;}
   .dot.ei{background:var(--accent-ei);}
   .dot.ai{background:var(--accent-ai);}
+  .dot.rep{background:var(--accent-rep);}
   footer .asof{font-weight:700; color:var(--ink);}
 </style>
 </head>
@@ -283,7 +301,8 @@
         <thead>
           <tr class="group-row">
             <th colspan="3"></th>
-            <th class="g-ei" colspan="3">고용보험</th>
+            <th class="g-rep">고용·산재 공통</th>
+            <th class="g-ei" colspan="2">고용보험</th>
             <th class="g-ai" colspan="3">산재보험</th>
             <th colspan="4"></th>
           </tr>
@@ -291,7 +310,7 @@
             <th class="left" style="width:34px">#</th>
             <th class="left" style="min-width:120px">이름</th>
             <th style="min-width:130px">월 지급액(사업소득)</th>
-            <th class="hl-ei" style="min-width:110px">월보수액<br><span class="col-note">(신고용)</span></th>
+            <th class="hl-rep" style="min-width:120px">월보수액<br><span class="col-note">(고용·산재 신고용)</span></th>
             <th class="hl-ei">근로자 부담</th>
             <th class="hl-ei">사업주 부담</th>
             <th class="hl-ai">강사 부담</th>
@@ -346,7 +365,7 @@
       <div class="check-card">
         <div class="check-card-title">① 고용보험 공제율·요율표</div>
         <p>근로복지공단이 공시하는 표에서 "방과후학교강사" 줄의 공제율이 아래 값과 같은지 확인하세요.</p>
-        <div class="check-values">이 계산기 값 — 16.5% · 16.5% · 14.9% · 19.3%<br><span class="check-values-sub">(2023.7~2024.6 / 2024.7~2025.6 / 2025.7~2026.6 / 2026.7~2027.6)</span></div>
+        <div class="check-values">이 계산기 값 — 23.5% · 16.5% · 16.5% · 14.9% · 19.3%<br><span class="check-values-sub">(2023.1~2023.6 / 2023.7~2024.6 / 2024.7~2025.6 / 2025.7~2026.6 / 2026.7~2027.6)</span></div>
         <a class="check-link" href="https://www.comwel.or.kr/comwel/paym/spec/spec7.jsp" target="_blank" rel="noopener">공식 표 열기 → 근로복지공단 &gt; 노무제공자 고용보험 &gt; 보험료 산정 및 부과 ↗</a>
       </div>
       <div class="check-card">
@@ -364,6 +383,7 @@
 
   <footer>
     <div class="legend">
+      <span><span class="dot rep"></span>월보수액 — 월 지급액에서 필요경비를 뺀 금액으로, 고용보험·산재보험 모두 이 금액으로 신고(2023년 상반기는 두 보험의 공제율이 달라 따로 표시)</span>
       <span><span class="dot ei"></span>고용보험 — 근로자·사업주 각 0.8% 분담, 필요경비 제외 후 월보수액 기준</span>
       <span><span class="dot ai"></span>산재보험 — 2023년은 사업주 전액 부담, 2024년 1월 귀속분부터는 강사·사업주가 1/2씩 분담</span>
     </div>
@@ -378,8 +398,11 @@
   "use strict";
 
   // ---- 근로복지공단 "방과후 학교강사" 요율 테이블 ----
+  // 고용보험 계산기는 2023년을 상반기(공제율 23.5%)·하반기(16.5%)로 나누고, 산재보험 계산기는 2023년을 한 기간으로 본다.
+  // 두 계산기를 한 선택지로 맞추기 위해 2023년을 둘로 나누고, 산재보험은 두 기간 모두 "2023" 기준을 쓴다.
   var PERIODS = [
-    {key:"2023",   label:"2023년"},
+    {key:"2023-1", label:"2023년 상반기(1~6월)"},
+    {key:"2023-2", label:"2023년 하반기(7~12월)"},
     {key:"2024-1", label:"2024년 상반기(1~6월)"},
     {key:"2024-2", label:"2024년 하반기(7~12월)"},
     {key:"2025-1", label:"2025년 상반기(1~6월)"},
@@ -390,7 +413,8 @@
 
   // 고용보험: 필요경비율(afterschool), 부담 상한액(근로자/사업주 각각)
   var EI = {
-    "2023":   {expenseRate:0.165, cap:275440},
+    "2023-1": {expenseRate:0.235, cap:275440},
+    "2023-2": {expenseRate:0.165, cap:275440},
     "2024-1": {expenseRate:0.165, cap:365520},
     "2024-2": {expenseRate:0.165, cap:365520},
     "2025-1": {expenseRate:0.165, cap:306360},
@@ -405,7 +429,8 @@
   // 산재보험: 필요경비율(%값*10 그대로 사용), 직종요율(‰), 출퇴근요율(‰)
   // split:false → 2023년, 사업주 전액 부담 / split:true → 2024년 1월 귀속분부터, 강사·사업주 각 1/2씩 부담
   var AI = {
-    "2023":   {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:1,   split:false},
+    "2023-1": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:1,   split:false},
+    "2023-2": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:1,   split:false},
     "2024-1": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
     "2024-2": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
     "2025-1": {deductionRateX10:165, jobRatePerMille:6, commuteRatePerMille:0.6, split:true},
@@ -458,33 +483,93 @@
     return {ei:ei, ai:ai, employeeTotal:employeeTotal, employerTotal:employerTotal, grandTotal:grandTotal};
   }
 
-  // ---------------- 자동 점검 상태 배너 ----------------
-  function renderStatus(status){
-    var el = document.getElementById("statusBanner");
-    if (!status){
-      el.className = "status-banner unknown";
-      el.innerHTML = '<span class="icon">ℹ️</span><span>자동 점검 결과를 아직 불러오지 못했습니다(첫 배포 직후이거나 오프라인 상태일 수 있음). 아래 "셀프체크" 표로 직접 확인해 주세요.</span>';
-      el.hidden = false;
-      return;
-    }
-    if (status.status === "ok"){
-      el.className = "status-banner ok";
-      el.innerHTML = '<span class="icon">✅</span><span><strong>최신 요율로 확인됨</strong> · 마지막 점검: ' + status.checkedAt + '</span>';
-    } else if (status.status === "changed"){
-      el.className = "status-banner warn";
-      var items = (status.issues || []).map(function(i){ return "<li>" + i + "</li>"; }).join("");
-      el.innerHTML = '<span class="icon">⚠️</span><div><strong>근로복지공단 요율에 변경이 감지되었습니다</strong>(점검일: ' + status.checkedAt + '). 계산 결과가 최신이 아닐 수 있으니 아래 공식 계산기와 대조해 주세요.<ul>' + items + '</ul></div>';
-    } else {
-      // status === "check_failed" 등: 점검 자체가 안 된 것이지, 요율이 바뀐 게 확인된 건 아님
-      el.className = "status-banner unknown";
-      el.innerHTML = '<span class="icon">ℹ️</span><span>지난 점검(' + status.checkedAt + ')이 완료되지 못했습니다(사이트 접속 실패 등). <strong>요율이 바뀐 것은 아닐 수 있습니다.</strong> 아래 "셀프체크" 표로 직접 확인해 주세요.</span>';
-    }
-    el.hidden = false;
+  // ---------------- 요율 점검 상태 배너 ----------------
+  // 1순위: Vercel 서울 리전의 실시간 점검 API(api/check.mjs). comwel.or.kr이 해외 IP를 막아
+  //        GitHub Pages·Actions에서는 직접 조회할 수 없어서, 한국 리전 함수가 대신 조회한다.
+  // 2순위: 관리자가 PC에서 수동 점검해 커밋한 rate-status.json (실시간 점검 서버가 응답하지 않을 때)
+  var LIVE_CHECK_URL = ""; // Vercel 배포 후 "https://<프로젝트>.vercel.app/api/check" 형태로 입력
+  var OFFICIAL_CALCS = [
+    {label:"고용보험 모의계산기", href:"https://www.comwel.or.kr/comwel/bohumcal2.jsp"},
+    {label:"산재보험 모의계산기", href:"https://www.comwel.or.kr/comwel/bohumcal4.jsp"}
+  ];
+  var SOURCE_NOTE = {
+    live: "근로복지공단 공식 계산기와 자동 대조",
+    manual: "관리자 수동 점검",
+    fallback: "관리자 수동 점검 결과 — 자동 점검 서버가 응답하지 않음"
+  };
+
+  function el(tag, className, text){
+    var n = document.createElement(tag);
+    if (className) n.className = className;
+    if (text != null) n.textContent = text;
+    return n;
   }
 
-  fetch("./rate-status.json", {cache:"no-store"})
-    .then(function(r){ if(!r.ok) throw new Error("no status file"); return r.json(); })
-    .then(renderStatus)
+  function officialLinks(){
+    var p = el("div", "links", "공식 계산기로 직접 확인: ");
+    OFFICIAL_CALCS.forEach(function(c, i){
+      if (i) p.appendChild(document.createTextNode(" · "));
+      var a = el("a", null, c.label + " ↗");
+      a.href = c.href; a.target = "_blank"; a.rel = "noopener";
+      p.appendChild(a);
+    });
+    return p;
+  }
+
+  function renderStatus(status, source){
+    var banner = document.getElementById("statusBanner");
+    var body = el("div");
+    var icon, tone;
+    if (!status){
+      tone = "unknown"; icon = "ℹ️";
+      body.appendChild(el("span", null, "요율 점검 결과를 불러오지 못했습니다(오프라인 상태일 수 있음). 아래 \"셀프체크\" 표나 공식 계산기로 직접 확인해 주세요."));
+      body.appendChild(officialLinks());
+    } else if (status.status === "ok"){
+      tone = "ok"; icon = "✅";
+      body.appendChild(el("strong", null, "최신 요율로 확인됨"));
+      body.appendChild(document.createTextNode(" · 마지막 점검: " + status.checkedAt + " "));
+      body.appendChild(el("span", "source", "(" + SOURCE_NOTE[source] + ")"));
+    } else if (status.status === "changed"){
+      tone = "warn"; icon = "⚠️";
+      body.appendChild(el("strong", null, "근로복지공단 요율에 변경이 감지되었습니다"));
+      body.appendChild(document.createTextNode(" (점검: " + status.checkedAt + "). 계산 결과가 최신이 아닐 수 있으니 공식 계산기와 대조해 주세요."));
+      var ul = el("ul");
+      (status.issues || []).forEach(function(i){ ul.appendChild(el("li", null, i)); });
+      body.appendChild(ul);
+      body.appendChild(officialLinks());
+    } else {
+      // status === "check_failed" 등: 점검 자체가 안 된 것이지, 요율이 바뀐 게 확인된 건 아님
+      tone = "unknown"; icon = "ℹ️";
+      body.appendChild(document.createTextNode("마지막 점검(" + status.checkedAt + ")이 완료되지 못했습니다(사이트 접속 실패 등). "));
+      body.appendChild(el("strong", null, "요율이 바뀐 것은 아닐 수 있습니다."));
+      body.appendChild(document.createTextNode(" 아래 \"셀프체크\" 표나 공식 계산기로 직접 확인해 주세요."));
+      body.appendChild(officialLinks());
+    }
+    banner.className = "status-banner " + tone;
+    banner.textContent = "";
+    banner.appendChild(el("span", "icon", icon));
+    banner.appendChild(body);
+    banner.hidden = false;
+  }
+
+  function fetchJson(url, timeoutMs){
+    var ctrl = window.AbortController ? new AbortController() : null;
+    var timer = ctrl && setTimeout(function(){ ctrl.abort(); }, timeoutMs);
+    return fetch(url, {cache:"no-store", signal: ctrl ? ctrl.signal : undefined})
+      .then(function(r){ if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+      .then(function(j){ clearTimeout(timer); return j; }, function(e){ clearTimeout(timer); throw e; });
+  }
+
+  (LIVE_CHECK_URL ? fetchJson(LIVE_CHECK_URL, 10000) : Promise.reject(new Error("live check not configured")))
+    .then(function(s){
+      if (s.status !== "ok" && s.status !== "changed") throw new Error("live check failed");
+      renderStatus(s, "live");
+    })
+    .catch(function(){
+      return fetchJson("./rate-status.json", 8000).then(function(s){
+        renderStatus(s, LIVE_CHECK_URL ? "fallback" : "manual");
+      });
+    })
     .catch(function(){ renderStatus(null); });
 
   // ---------------- UI ----------------
@@ -521,7 +606,7 @@
       if (raw){
         var data = JSON.parse(raw);
         if (data && Array.isArray(data.rows) && data.rows.length){
-          if (data.period) periodSelect.value = data.period;
+          if (EI[data.period]) periodSelect.value = data.period; // 없어진 기간 키(예: 예전 "2023")는 무시
           return data.rows;
         }
       }
@@ -554,7 +639,7 @@
       '<td class="left">' + rowSeq + '</td>' +
       '<td class="left"><input class="name-input f-name" type="text" placeholder="이름"></td>' +
       '<td><input class="f-income" type="text" inputmode="numeric" placeholder="0"></td>' +
-      '<td class="hl-ei out-monthly-salary">0</td>' +
+      '<td class="hl-rep out-monthly-salary">0</td>' +
       '<td class="hl-ei out-employee">0</td>' +
       '<td class="hl-ei out-employer-ei">0</td>' +
       '<td class="hl-ai out-ai-employee">0</td>' +
@@ -591,17 +676,30 @@
     });
   }
 
+  // 월보수액(신고용): 고용·산재가 같은 금액이면 하나만, 다르면(2023년 상반기처럼 두 보험의 공제율이 다른 기간) 둘 다 표시
+  function renderSalary(cell, eiSalary, aiBase){
+    if (eiSalary === aiBase){
+      cell.textContent = won(eiSalary);
+      cell.dataset.copy = won(eiSalary);
+      return;
+    }
+    cell.innerHTML =
+      '<span class="split-line"><span class="tag">고용</span>' + won(eiSalary) + '</span>' +
+      '<span class="split-line"><span class="tag">산재</span>' + won(aiBase) + '</span>';
+    cell.dataset.copy = "고용 " + won(eiSalary) + " / 산재 " + won(aiBase);
+  }
+
   function recalcAll(){
     renumber();
     var periodKey = periodSelect.value;
-    var sums = {monthlySalary:0, employee:0, employerEi:0, aiEmployee:0, aiEmployer:0, employeeTotal:0, employerTotal:0, grand:0};
+    var sums = {monthlySalary:0, aiBase:0, employee:0, employerEi:0, aiEmployee:0, aiEmployer:0, employeeTotal:0, employerTotal:0, grand:0};
     var first = null;
 
     Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
       var income = parseNum(tr.querySelector(".f-income").value);
       if (!income){
         tr.classList.remove("excluded");
-        tr.querySelector(".out-monthly-salary").textContent = "0";
+        renderSalary(tr.querySelector(".out-monthly-salary"), 0, 0);
         tr.querySelector(".out-employee").textContent = "0";
         tr.querySelector(".out-employer-ei").textContent = "0";
         tr.querySelector(".out-ai-employee").textContent = "0";
@@ -614,7 +712,7 @@
       }
       var r = calcPerson(income, periodKey);
       tr.classList.toggle("excluded", r.ei.excluded);
-      tr.querySelector(".out-monthly-salary").textContent = won(r.ei.monthlySalary);
+      renderSalary(tr.querySelector(".out-monthly-salary"), r.ei.monthlySalary, r.ai.base);
       tr.querySelector(".out-employee").textContent = won(r.ei.employeeCost);
       tr.querySelector(".out-employer-ei").textContent = won(r.ei.employerCost);
       tr.querySelector(".out-ai-employee").textContent = won(r.ai.employeeShare);
@@ -625,6 +723,7 @@
       tr.querySelector(".out-grand").textContent = won(r.grandTotal);
 
       sums.monthlySalary += r.ei.monthlySalary;
+      sums.aiBase += r.ai.base;
       sums.employee += r.ei.employeeCost;
       sums.employerEi += r.ei.employerCost;
       sums.aiEmployee += r.ai.employeeShare;
@@ -636,7 +735,7 @@
       if (!first) first = {name: tr.querySelector(".f-name").value || "(이름 미입력)", income:income, r:r};
     });
 
-    document.getElementById("sumMonthlySalary").textContent = won(sums.monthlySalary);
+    renderSalary(document.getElementById("sumMonthlySalary"), sums.monthlySalary, sums.aiBase);
     document.getElementById("sumEmployee").textContent = won(sums.employee);
     document.getElementById("sumEmployerEi").textContent = won(sums.employerEi);
     document.getElementById("sumAiEmployee").textContent = won(sums.aiEmployee);
@@ -715,7 +814,7 @@
   });
 
   document.getElementById("copyBtn").addEventListener("click", function(){
-    var header = ["이름","월지급액","월보수액(고용신고용)","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
+    var header = ["이름","월지급액","월보수액(고용·산재 신고용)","고용_근로자부담","고용_사업주부담","산재_강사부담","산재_사업주부담","강사본인총부담","사업주총부담","월보험료총액"];
     var lines = [header.join("\t")];
     Array.prototype.forEach.call(rowsBody.querySelectorAll("tr"), function(tr){
       var income = parseNum(tr.querySelector(".f-income").value);
@@ -723,7 +822,7 @@
       lines.push([
         tr.querySelector(".f-name").value,
         tr.querySelector(".f-income").value,
-        tr.querySelector(".out-monthly-salary").textContent,
+        tr.querySelector(".out-monthly-salary").dataset.copy,
         tr.querySelector(".out-employee").textContent,
         tr.querySelector(".out-employer-ei").textContent,
         tr.querySelector(".out-ai-employee").textContent,
@@ -734,7 +833,7 @@
       ].join("\t"));
     });
     lines.push(["합계","",
-      document.getElementById("sumMonthlySalary").textContent,
+      document.getElementById("sumMonthlySalary").dataset.copy,
       document.getElementById("sumEmployee").textContent,
       document.getElementById("sumEmployerEi").textContent,
       document.getElementById("sumAiEmployee").textContent,

@@ -1,0 +1,9 @@
+{
+  "regions": ["icn1"],
+  "functions": {
+    "api/check.mjs": {
+      "includeFiles": "known-rates.json",
+      "maxDuration": 30
+    }
+  }
+}

@@ -10,9 +10,35 @@
 2. 저장소 **Settings → Pages → Build and deployment → Source: Deploy from a branch**, 브랜치는 `main`, 폴더는 `/ (root)`로 설정한다.
 3. 몇 분 뒤 `https://<계정명>.github.io/<저장소명>/` 주소로 접속할 수 있다.
 
-## 요율 점검 (수동, 필요할 때만)
+## 요율 점검
 
-comwel.or.kr은 해외/클라우드 데이터센터 IP에서의 접속을 방화벽 단에서 막고 있어(GitHub Actions 클라우드 러너로 시도하면 HTTP 400), **완전 자동화(예: 매달 자동 실행)는 불가능합니다.** 그래서 한국 IP를 쓰는 관리자의 PC에서 필요할 때 직접 실행하는 방식을 씁니다.
+### 왜 GitHub Actions로는 안 되나
+
+comwel.or.kr은 **해외 IP를 지역 단위로 차단**합니다. 2026-09-10에 [Globalping](https://globalping.io)으로 여러 나라의 서버에서 고용보험 계산기에 접속해 확인한 결과는 다음과 같습니다.
+
+| 접속 위치 | 결과 |
+|---|---|
+| 미국 Azure(GitHub Actions와 같은 환경)·미국 AWS·일본 AWS·일본 가정용 회선 | HTTP 400 |
+| 한국 리전 AWS(서울)·Azure(한국 중부)·GCP(서울)·Oracle(서울·춘천)·Vultr(서울) | HTTP 200 |
+
+즉 클라우드라서 막히는 것이 아니라 해외라서 막히는 것이므로, **한국 리전에서 실행되는 서버리스 함수**로 해결할 수 있습니다.
+
+### 실시간 자동 점검 (Vercel 서울 리전)
+
+`api/check.mjs`는 Vercel의 서울 리전(`vercel.json`의 `"regions": ["icn1"]`)에서 실행되는 함수입니다. 호출되면 근로복지공단 고용보험·산재보험 모의계산기를 직접 조회해 `known-rates.json`과 비교한 결과를 돌려줍니다. `index.html`은 페이지를 열 때마다 이 결과를 받아 맨 위 배너에 "최신 요율로 확인됨 · 마지막 점검: 2026-09-10 15:02" 형태로 보여줍니다. 결과는 Vercel CDN에 1시간 캐시되므로 공단 사이트에는 많아야 시간당 한 번 요청이 갑니다.
+
+**최초 설정(한 번만):**
+
+1. [vercel.com](https://vercel.com)에 GitHub 계정으로 가입(Hobby 무료 플랜, 카드 등록 불필요)한다.
+2. **Add New → Project**에서 이 저장소를 Import한다. Framework Preset은 **Other**, 나머지 설정은 그대로 두고 **Deploy**한다.
+3. 배포가 끝나면 `https://<프로젝트명>.vercel.app/api/check`를 열어 `"status":"ok"`, `"region":"icn1"`이 나오는지 확인한다.
+4. `index.html`의 `LIVE_CHECK_URL`에 그 주소를 넣고 커밋·푸시한다.
+
+이후에는 `main`에 푸시할 때마다 Vercel이 자동으로 다시 배포하므로 `known-rates.json`을 고치면 점검 기준도 자동으로 따라갑니다.
+
+### 수동 점검 (관리자 PC, 예비용)
+
+실시간 점검 서버가 응답하지 않으면 페이지는 대신 `rate-status.json`(관리자가 마지막으로 수동 점검한 결과)을 보여줍니다. 또 요율표를 갱신한 뒤 `known-rates.json`에 넣을 새 기준값을 얻을 때도 이 방법을 씁니다. 반드시 한국 IP에서 실행해야 합니다.
 
 **실행 방법:** `scripts/check-and-publish.cmd`를 더블클릭한다. (내부적으로 `check-and-publish.ps1`을 실행함)
 
@@ -24,7 +50,7 @@ comwel.or.kr은 해외/클라우드 데이터센터 IP에서의 접속을 방화
 
 서버나 백그라운드 서비스를 켜둘 필요가 없습니다 — 실행하고 창을 닫으면 끝입니다.
 
-`index.html`은 페이지가 열릴 때마다 같은 저장소의 `rate-status.json`을 읽어(동일 출처라 CORS 문제 없음) 맨 위에 상태 배너로 보여줍니다. 즉, **관리자가 한 번 점검해두면, 이 계산기를 쓰는 모든 사람이 페이지를 열 때 최신 여부를 바로 볼 수 있습니다.** `rate-status.json`의 `status`는 세 가지입니다:
+실시간 점검 API와 `rate-status.json`의 `status`는 세 가지입니다:
 
 - `"ok"` — 최신 요율로 확인됨
 - `"changed"` — 요율이 실제로 바뀐 것을 확인함 (아래 갱신 절차 필요)
@@ -42,6 +68,8 @@ comwel.or.kr은 해외/클라우드 데이터센터 IP에서의 접속을 방화
 
 - `index.html` — 계산기 페이지 (수정할 필요가 없는 한 이 파일만 열면 됨)
 - `known-rates.json` — 마지막으로 사람이 확인·반영한 요율의 "기준값"
-- `rate-status.json` — 가장 최근 점검 결과 (점검 스크립트 실행 시 갱신)
-- `scripts/check-rates.mjs` — 요율 점검 스크립트
+- `rate-status.json` — 가장 최근 수동 점검 결과 (실시간 점검 서버가 응답하지 않을 때 배너에 표시)
+- `lib/rate-check.mjs` — 요율 점검 공용 로직 (실시간·수동 점검이 함께 사용)
+- `api/check.mjs`, `vercel.json` — Vercel 서울 리전 실시간 점검 API
+- `scripts/check-rates.mjs` — 수동 요율 점검 스크립트
 - `scripts/check-and-publish.ps1` / `.cmd` — 위 스크립트를 실행하고 결과를 커밋·푸시까지 하는 더블클릭용 실행기
