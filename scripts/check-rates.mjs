@@ -41,18 +41,51 @@ function setOutput(name, value) {
   if (file) appendFileSync(file, `${name}=${value}\n`);
 }
 
+// GitHub Actions 러너의 기본 User-Agent로는 일부 정부기관 사이트가 접속을 막거나
+// 다른 응답을 줄 수 있어, 일반 브라우저처럼 보이는 헤더를 붙여서 요청한다.
+async function fetchHtml(url, label) {
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+    },
+  });
+  const text = await res.text();
+  // 워크플로 로그에서만 보이는 진단 정보(커밋되는 파일에는 남기지 않음).
+  console.log(`[진단] ${label} 응답 상태: ${res.status}, 본문 길이: ${text.length}자`);
+  if (!res.ok) {
+    console.log(`[진단] ${label} 응답 앞부분 500자:\n${text.slice(0, 500)}`);
+    throw new Error(`${label} 요청 실패 (HTTP ${res.status})`);
+  }
+  return text;
+}
+
 async function main() {
   const known = JSON.parse(readFileSync("known-rates.json", "utf8"));
   const issues = [];
   const today = new Date().toISOString().slice(0, 10);
 
-  const eiHtml = await fetch(EI_URL).then((r) => r.text());
-  const eiLatestPeriod = newestSelectValue(eiHtml, "year");
-  const eiHash = sha256(extractBetween(eiHtml, 'case "afterschool":', 'case "quick":'));
+  const eiHtml = await fetchHtml(EI_URL, "고용보험 계산기");
+  let eiLatestPeriod, eiHash;
+  try {
+    eiLatestPeriod = newestSelectValue(eiHtml, "year");
+    eiHash = sha256(extractBetween(eiHtml, 'case "afterschool":', 'case "quick":'));
+  } catch (err) {
+    console.log(`[진단] 고용보험 계산기 응답 앞부분 1000자:\n${eiHtml.slice(0, 1000)}`);
+    throw err;
+  }
 
-  const aiHtml = await fetch(AI_URL).then((r) => r.text());
-  const aiLatestPeriod = newestSelectValue(aiHtml, "targetYear");
-  const aiHash = sha256(extractBetween(aiHtml, "'after-school-instructor'", "'tour-guide-interpreter'"));
+  const aiHtml = await fetchHtml(AI_URL, "산재보험 계산기");
+  let aiLatestPeriod, aiHash;
+  try {
+    aiLatestPeriod = newestSelectValue(aiHtml, "targetYear");
+    aiHash = sha256(extractBetween(aiHtml, "'after-school-instructor'", "'tour-guide-interpreter'"));
+  } catch (err) {
+    console.log(`[진단] 산재보험 계산기 응답 앞부분 1000자:\n${aiHtml.slice(0, 1000)}`);
+    throw err;
+  }
 
   if (eiLatestPeriod !== known.eiLatestPeriod) {
     issues.push(`고용보험 계산기에 새 적용기간이 추가됨: ${eiLatestPeriod} (마지막 반영: ${known.eiLatestPeriod})`);

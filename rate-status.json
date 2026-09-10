@@ -1,7 +1,5 @@
 {
-  "upToDate": false,
+  "upToDate": true,
   "checkedAt": "2026-09-10",
-  "issues": [
-    "자동 점검 스크립트 실행 중 오류가 발생했습니다: select #year 를 찾지 못함 — 공식 계산기를 직접 확인해 주세요."
-  ]
+  "issues": []
 }
